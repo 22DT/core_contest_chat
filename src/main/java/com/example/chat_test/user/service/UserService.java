@@ -18,6 +18,10 @@ public class UserService {
         return userRepository.save(nickname, teamId);
     }
 
+    public UserDomain getUserById(Long userId){
+        return userRepository.getUser(userId);
+    }
+
     public List<UserDomain> getUsersByTeam(Long teamId) {
         return userRepository.getUsers(teamId);
     }

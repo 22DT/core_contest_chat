@@ -16,6 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 public class ChatUser {
     @Id @GeneratedValue(strategy = IDENTITY)
+    @Column(name="chat_user_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)

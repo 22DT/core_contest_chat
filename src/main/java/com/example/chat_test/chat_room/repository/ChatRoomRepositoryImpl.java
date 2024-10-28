@@ -12,14 +12,14 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class ChatRoomJpaRepositoryImpl implements ChatRoomRepository {
+public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     private final ChatRoomJpaRepository chatRoomJpaRepository;
 
 
     @Override
-    public Long createGroupChatRoom() {
+    public Long createChatRoom(ChatRoomType type) {
         ChatRoom chatRoom = ChatRoom.builder()
-                .type(ChatRoomType.GROUP)
+                .type(type)
                 .build();
 
         return chatRoomJpaRepository.save(chatRoom).getId();

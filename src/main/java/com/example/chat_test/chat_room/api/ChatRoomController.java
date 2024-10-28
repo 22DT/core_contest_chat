@@ -18,7 +18,7 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
 
-    @PostMapping("/api/chat-rooms")
+    @PostMapping("/api/group")
     public ResponseEntity<Long> createCroupChatRoom(@RequestParam("userId")Long userId,
                                                     @RequestParam("teamId")Long teamId) {
         UserDomain user = UserDomain.builder()
@@ -27,6 +27,17 @@ public class ChatRoomController {
 
         Long chatRoomId = chatRoomService.createGroupChatRoom(user, teamId);
         return ResponseEntity.ok(chatRoomId);
+    }
+
+    @PostMapping("/api/private")
+    public ResponseEntity<Long> createPrivateChatRoom(@RequestParam("userId")Long userId,
+                                                      @RequestParam("targetUserId")Long targetUserId) {
+        UserDomain user = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        Long privateChatRoom = chatRoomService.createPrivateChatRoom(user, targetUserId);
+        return ResponseEntity.ok(privateChatRoom);
     }
 
 
