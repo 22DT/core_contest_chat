@@ -18,7 +18,6 @@ public class ChatUser {
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name="chat_user_id")
     private Long id;
-
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name="user_id")
     private User user;

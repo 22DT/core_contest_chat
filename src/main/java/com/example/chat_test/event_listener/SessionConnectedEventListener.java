@@ -38,11 +38,8 @@ public class SessionConnectedEventListener {
         String userId = accessor.getFirstNativeHeader("userId");
         log.info("userId= {}", userId);
 
-
         UserPrincipal principal = new UserPrincipal(userId);
-
         ((DefaultSimpUserRegistry)simpUserRegistry).onApplicationEvent(new SessionConnectedEvent(this, event.getMessage(), principal));
-
 
         Set<SimpUser> users = simpUserRegistry.getUsers();
         log.info("users= {}", users);

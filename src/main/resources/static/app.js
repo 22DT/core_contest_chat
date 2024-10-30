@@ -1,5 +1,5 @@
 const stompClient = new StompJs.Client({
-    brokerURL: 'ws://localhost:8080/gs-guide-websocket'
+    brokerURL: 'ws://localhost:8080/ws-chat'
 });
 
 let currentSubscription = null; // 현재 구독을 저장하는 변수
@@ -57,7 +57,7 @@ function subscribe() {
             const chatMessage = JSON.parse(message.body);
 
             // name: content 형식으로 메시지 출력
-            showGreeting(chatMessage.name + ": " + chatMessage.content);
+            showGreeting(chatMessage.userId + ": [" + chatMessage.message + "] ["+chatMessage.createdAt+"]");
         },
         { userId: $("#userId").val() } // userId를 헤더로 추가
     );
@@ -74,15 +74,18 @@ function unsubscribe() {
 function sendMessage() {
     const destination = $("#send_destination").val();
     const message = {
-        roomId: $("#roomId").val(),
-        name: $("#name").val(),
-        content: $("#content").val()
+
+        userId:$("#send_userId").val(),
+        roomId: $("#send_roomId").val(),
+        message: $("#send_message").val(),
+        createdAt: new Date().toISOString(), // 현재 시간을 ISO 형식으로 설정
+        messageType: "TALK"
     };
 
     stompClient.publish({
-        header:{
+        /*header:{
           name: $("#name").val()
-        },
+        },*/
         destination: destination,
         body: JSON.stringify(message),
     });

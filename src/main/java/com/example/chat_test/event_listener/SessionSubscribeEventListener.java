@@ -58,12 +58,32 @@ public class SessionSubscribeEventListener {
      *
      * SimpMessageHeaderAccessor 여기 기능이 많네?
      *
+     * 구독할 때 딱히 할 작업은 없는 거 같은데..?
+     *
      */
     @EventListener
     public void onSessionSubscribe(SessionSubscribeEvent event) {
-        log.info("Session Subscribe Event");
-
+        log.info("[SessionSubscribeEventListener][onSessionSubscribe]");
         Message<byte[]> message = event.getMessage();
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        String destination = accessor.getDestination();
+        String sessionId = accessor.getSessionId();
+        String subscriptionId = accessor.getSubscriptionId();
+        String userId = accessor.getFirstNativeHeader("userId");
+
+        log.info("userId= {}", userId);
+        log.info("sessionId= {}", sessionId);
+        log.info("subscriptionId: {}", subscriptionId);
+        log.info("destination= {}", destination);
+
+
+
+
+        sendEntryMessage(message);
+    }
+
+
+    private void sendEntryMessage(Message<?> message){
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         String destination = accessor.getDestination();
         String sessionId = accessor.getSessionId();
@@ -76,7 +96,7 @@ public class SessionSubscribeEventListener {
         log.info("sessionId= {}", sessionId);
         log.info("subscriptionId: {}", subscriptionId);
         log.info("userId= {}", userId);
-        
+
 
 
         Set<SimpUser> users = simpUserRegistry.getUsers();

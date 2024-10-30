@@ -26,26 +26,34 @@
             </form>
         </div>
         <div class="col-md-6">
-            <form class="form-inline">
-                <div class="form-group">
-                    <label for="send_destination">What is destination?</label>
-                    <input type="text" id="send_destination" class="form-control" placeholder="/app/hello">
-                </div>
-                <div class="form-group">
-                    <label for="roomId">What is your roomId?</label>
-                    <input type="text" id="roomId" class="form-control" placeholder="Your roomId here...">
-                </div>
-                <div class="form-group">
-                    <label for="name">What is your name?</label>
-                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
-                </div>
-                <div class="form-group">
-                    <label for="content">What is your content?</label>
-                    <input type="text" id="content" class="form-control" placeholder="Your content here...">
-                </div>
-                <button id="send" class="btn btn-default" type="submit">Send</button>
-            </form>
+            <div class="form-container" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+                <h3 style="margin-bottom: 20px; text-align: center;">Send Frame</h3>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label for="send_userId">userId?</label>
+                        <input type="text" id="send_userId" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="send_destination">send_destination?</label>
+                        <input type="text" id="send_destination" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="send_roomId">roomId</label>
+                        <input type="text" id="send_roomId" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="send_message">send_message</label>
+                        <input type="text" id="send_message" class="form-control">
+                    </div>
+                  <!--  <div class="form-group">
+                        <label for="send_messageType">What is your name?</label>
+                        <input type="text" id="send_messageType" class="form-control">
+                    </div>-->
+                    <button id="send" class="btn btn-default" type="submit">Send</button>
+                </form>
+            </div>
         </div>
+
     </div>
     <div class="row">
         <div class="col-md-12">

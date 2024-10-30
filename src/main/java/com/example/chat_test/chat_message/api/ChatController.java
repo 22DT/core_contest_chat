@@ -1,11 +1,14 @@
-package com.example.chat_test.chat;
+package com.example.chat_test.chat_message.api;
 
+import com.example.chat_test.chat_message.dto.request.SendChatMessageRequest;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.broker.SubscriptionRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.user.SimpSession;
@@ -24,13 +27,12 @@ import java.util.Set;
 public class ChatController  {
     private final SimpMessageSendingOperations template;
     private final SimpUserRegistry simpUserRegistry;
-    private final SubscriptionRegistry subscriptionRegistry;
 
 
-    @MessageMapping("/test")
+    @MessageMapping("/topic")
 //    @SendTo("topic/greetings")
-    public void sendMessage(@Payload ChatMessage chatMessage, StompHeaderAccessor accessor) {
-        log.info("[ChatController][sendMessage]");
+    public void topic(@Payload SendChatMessageRequest chatMessage) {
+        log.info("[ChatController][topic]");
         log.info("chatMessage: {}", chatMessage);
         Set<SimpUser> users = simpUserRegistry.getUsers();
 
@@ -38,13 +40,28 @@ public class ChatController  {
 
 //        message.setContent("user"+message.getName()+": "+message.getContent());
 
-        List<Long> onlineUsers = getOnlineUsers(chatMessage.getRoomId());
+        List<Long> onlineUsers = getOnlineUsers(chatMessage.roomId());
         log.info("onlineUsers= {}", onlineUsers);
 
-        template.convertAndSend("/topic/" + chatMessage.roomId, chatMessage);
+        template.convertAndSend("/topic/" + chatMessage.roomId(), chatMessage);
+    }
+
+    @MessageMapping("/queue")
+    public void queue(@Payload SendChatMessageRequest chatMessage) {
+        log.info("[ChatController][queue]");
     }
 
 
+    /**
+     *
+     *
+     * @apiNote
+     * /app/sub 해야 호출됨
+     */
+    @SubscribeMapping("/sub")
+    public void subscribe() {
+        log.info("[ChatController][subscribe]");
+    }
 
     private List<Long> getOnlineUsers(Long roomId){
         Set<SimpUser> users = simpUserRegistry.getUsers();
@@ -71,10 +88,5 @@ public class ChatController  {
         return onlineUsers;
     }
 
-    @Data
-    public static class ChatMessage{
-        private Long roomId;
-        private String name;
-        private String content;
-    }
+
 }
