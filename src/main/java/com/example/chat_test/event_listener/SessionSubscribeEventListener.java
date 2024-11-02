@@ -1,6 +1,8 @@
 package com.example.chat_test.event_listener;
 
-import com.example.chat_test.Greeting;
+import com.example.chat_test.chat_message.MessageType;
+import com.example.chat_test.chat_message.dto.request.ChatMessageRequest;
+import com.example.chat_test.chat_message.dto.response.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -21,6 +23,7 @@ import org.springframework.web.socket.messaging.DefaultSimpUserRegistry;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,7 +105,16 @@ public class SessionSubscribeEventListener {
         Set<SimpUser> users = simpUserRegistry.getUsers();
         log.info("users: {}", users);
 
-        template.convertAndSend(destination, new Greeting(userId+"입장!"));
+        Long roomId = getRoomId(destination);
+        ChatMessageResponse msg = new ChatMessageResponse(Long.valueOf(userId), roomId, "입장!", LocalDateTime.now(), MessageType.ENTER);
+        template.convertAndSend(destination, msg);
+    }
+
+    private Long getRoomId(String destination){
+        int i = destination.lastIndexOf('/');
+        Long roomId = Long.valueOf(destination.substring(i + 1));
+
+        return roomId;
     }
 
     private void handlerDuplicate(String userId, String sessionId, String subscriptionId, String destination, SessionSubscribeEvent event ){

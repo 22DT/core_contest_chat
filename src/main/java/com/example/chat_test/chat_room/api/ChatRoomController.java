@@ -21,6 +21,7 @@ public class ChatRoomController {
     @PostMapping("/api/group")
     public ResponseEntity<Long> createCroupChatRoom(@RequestParam("userId")Long userId,
                                                     @RequestParam("teamId")Long teamId) {
+        // 임시로
         UserDomain user = UserDomain.builder()
                 .id(userId)
                 .build();

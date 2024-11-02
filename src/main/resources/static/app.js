@@ -78,7 +78,7 @@ function sendMessage() {
         userId:$("#send_userId").val(),
         roomId: $("#send_roomId").val(),
         message: $("#send_message").val(),
-        createdAt: new Date().toISOString(), // 현재 시간을 ISO 형식으로 설정
+        // createdAt: new Date().toISOString(), // 현재 시간을 ISO 형식으로 설정
         messageType: "TALK"
     };
 

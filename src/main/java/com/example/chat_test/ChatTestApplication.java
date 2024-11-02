@@ -17,10 +17,13 @@ public class ChatTestApplication {
 *
 
 insert into users(team_id, user_id, nickname) values(1, 1, '짱구');
-insert into users(team_id, user_id, nickname) values(1, 2, '철수');
-insert into users(team_id, user_id, nickname) values(1, 3, '맹구');
-insert into users(team_id, user_id, nickname) values(2, 4, '훈이');
-insert into users(team_id, user_id, nickname) values(2, 5, '흰둥이');
+insert into users(team_id, user_id, nickname) values(1, 2, '짱아');
+insert into users(team_id, user_id, nickname) values(1, 3, '흰둥이');
+insert into users(team_id, user_id, nickname) values(2, 4, '철수');
+insert into users(team_id, user_id, nickname) values(2, 5, '맹구');
+insert into users(team_id, user_id, nickname) values(3, 6, '훈이');
+
+
 
 *
 * */

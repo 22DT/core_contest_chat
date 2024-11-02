@@ -41,4 +41,19 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
 
         chatUserJpaRepository.saveAll(chatUsers);
     }
+
+    @Override
+    public List<ChatUser> getChatUsers(Long chatRoomId) {
+        return chatUserJpaRepository.findChatUsersByRoomId(chatRoomId);
+    }
+
+    @Override
+    public ChatUser getChatUser(Long roomId, Long userId) {
+        log.info("[ChatUserRepositoryImpl][getChatUser]");
+        log.info("roomId: {}", roomId);
+        log.info("userId: {}", userId);
+        return chatUserJpaRepository.findChatUserByUserIdAndChatRoomId(userId, roomId)
+                .orElseThrow(() -> new IllegalArgumentException("ChatUser is not found"));
+
+    }
 }
