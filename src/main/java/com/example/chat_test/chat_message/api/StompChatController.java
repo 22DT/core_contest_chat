@@ -3,6 +3,7 @@ package com.example.chat_test.chat_message.api;
 import com.example.chat_test.chat_message.dto.request.ChatMessageRequest;
 import com.example.chat_test.chat_message.dto.response.ChatMessageResponse;
 import com.example.chat_test.chat_message.service.ChatMessageService;
+import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,14 +11,24 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.user.SimpSession;
+import org.springframework.messaging.simp.user.SimpSubscription;
+import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class ChatController  {
+public class StompChatController  {
     private final SimpMessageSendingOperations template;
     private final ChatMessageService chatMessageService;
+    private final SimpUserRegistry simpUserRegistry;
 
 
 
@@ -32,7 +43,9 @@ public class ChatController  {
                 .id(chatMessage.userId())
                 .build();
 
-        ChatMessageResponse chatMessageResponse = chatMessageService.save(chatMessage, user);
+        List<Long> onlineUserIds = getOnlineUsers(chatMessage.roomId());
+
+        ChatMessageResponse chatMessageResponse = chatMessageService.send(onlineUserIds,chatMessage, user);
 
         template.convertAndSend("/topic/" + chatMessageResponse.roomId(), chatMessageResponse);
     }
@@ -54,6 +67,33 @@ public class ChatController  {
         log.info("[ChatController][subscribe]");
     }
 
+
+
+
+    private List<Long> getOnlineUsers(Long roomId){
+        Set<SimpUser> users = simpUserRegistry.getUsers();
+        List<Long> onlineUsers = new ArrayList<>();
+        for (SimpUser user : users) {
+            Set<SimpSession> sessions = user.getSessions();
+            for (SimpSession session : sessions) {
+                Set<SimpSubscription> subscriptions = session.getSubscriptions();
+                for (SimpSubscription subscription : subscriptions) {
+                    String destination = subscription.getDestination();
+                    int idx = destination.lastIndexOf('/');
+                    if (idx != -1) {
+                        Long userRoomId= Long.valueOf(destination.substring(idx+1));
+                        if(roomId.equals(userRoomId)){
+                            onlineUsers.add(Long.valueOf(user.getName()));
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        return onlineUsers;
+    }
 
 
 
