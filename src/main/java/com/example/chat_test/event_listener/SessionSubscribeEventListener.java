@@ -1,33 +1,21 @@
 package com.example.chat_test.event_listener;
 
 import com.example.chat_test.chat_message.MessageType;
-import com.example.chat_test.chat_message.dto.request.ChatMessageRequest;
 import com.example.chat_test.chat_message.dto.response.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.broker.SubscriptionRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.simp.user.SimpSession;
-import org.springframework.messaging.simp.user.SimpSubscription;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.messaging.support.GenericMessage;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.messaging.DefaultSimpUserRegistry;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Controller
@@ -35,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionSubscribeEventListener {
     private final SimpMessageSendingOperations template;
     private final SimpUserRegistry simpUserRegistry;
-    private final SubscriptionRegistry subscriptionRegistry;
+    private  SubscriptionRegistry subscriptionRegistry;
 
 
     /**
@@ -62,6 +50,8 @@ public class SessionSubscribeEventListener {
      * SimpMessageHeaderAccessor 여기 기능이 많네?
      *
      * 구독할 때 딱히 할 작업은 없는 거 같은데..?
+     * 
+     * 이걸로 누가 채팅방 활성화 했으니 읽음수 갱신하라고 클라이언트로 메시지 보내야 하나?
      *
      */
     @EventListener
@@ -106,7 +96,7 @@ public class SessionSubscribeEventListener {
         log.info("users: {}", users);
 
         Long roomId = getRoomId(destination);
-        ChatMessageResponse msg = new ChatMessageResponse(Long.valueOf(userId), roomId, "입장!", LocalDateTime.now(), MessageType.ENTER);
+        ChatMessageResponse msg = new ChatMessageResponse(Long.valueOf(userId), "nickname","profileUrl", "입장!", MessageType.ENTER, -1, LocalDateTime.now());
         template.convertAndSend(destination, msg);
     }
 
@@ -117,13 +107,13 @@ public class SessionSubscribeEventListener {
         return roomId;
     }
 
-    private void handlerDuplicate(String userId, String sessionId, String subscriptionId, String destination, SessionSubscribeEvent event ){
-        /*int lastIndexOf = destination.lastIndexOf('/');
+    /*private void handlerDuplicate(String userId, String sessionId, String subscriptionId, String destination, SessionSubscribeEvent event ){
+        *//*int lastIndexOf = destination.lastIndexOf('/');
         String roomId = destination.substring(lastIndexOf + 1);
         log.info("roomId: {}", roomId);
 
 
-        if(roomId.equals("error")){throw new RuntimeException("잘못된 구독입니다!");}*/
+        if(roomId.equals("error")){throw new RuntimeException("잘못된 구독입니다!");}*//*
 
         SimpUser user = simpUserRegistry.getUser(userId);
         SimpSession session = user.getSession(sessionId);
@@ -150,6 +140,6 @@ public class SessionSubscribeEventListener {
             return;
 
         }
-    }
+    }*/
 
 }

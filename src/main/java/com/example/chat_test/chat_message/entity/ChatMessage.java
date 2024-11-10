@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -20,7 +21,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 public class ChatMessage {
     @Id @GeneratedValue(strategy = IDENTITY)
-    @Column(name = "chat_message")
+    @Column(name = "chat_message_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
@@ -28,11 +29,17 @@ public class ChatMessage {
     private ChatRoom chatRoom;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name="writer_id")
-    private ChatUser Writer;
+    @JoinColumn(name="chat_user_id")
+    private ChatUser chatUser;
 
     private String message;
-    private LocalDateTime createdAt;
+
+    @Enumerated(STRING)
     private MessageType messageType;
+
+    private Integer readCount;
+    private LocalDateTime createdAt;
+
+
 
 }

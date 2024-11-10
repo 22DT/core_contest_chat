@@ -9,8 +9,11 @@ import com.example.chat_test.user.repository.UserJpaRepository;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +36,7 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
             ChatUser chatUser = ChatUser.builder()
                     .chatRoom(chatRoom)
                     .user(proxyUser)
+                    .lastAccessedAt(LocalDateTime.now())
                     .build();
 
             chatUsers.add(chatUser);
@@ -44,8 +48,14 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
 
     @Override
     public List<ChatUser> getChatUsers(Long chatRoomId) {
-        return chatUserJpaRepository.findChatUsersByRoomId(chatRoomId);
+        return chatUserJpaRepository.findChatUsersByChatRoomId(chatRoomId);
     }
+
+    @Override
+    public List<ChatUser> getChatUsersByUserId(Long userId) {
+        return chatUserJpaRepository.findChatUsersByUserId(userId);
+    }
+
 
     @Override
     public ChatUser getChatUser(Long roomId, Long userId) {

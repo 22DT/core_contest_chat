@@ -26,4 +26,7 @@ public class UserService {
         return userRepository.getUsers(teamId);
     }
 
+
+    public List<UserDomain>getUsersByRoom(Long roomId) {return  userRepository.getUsersByRoomId(roomId);}
+
 }

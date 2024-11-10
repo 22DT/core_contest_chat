@@ -13,5 +13,6 @@ public class UserDomain {
     private Long id;
     private String nickname;
     private Long teamId;
+    private String snsProfileImageUrl;
 
 }

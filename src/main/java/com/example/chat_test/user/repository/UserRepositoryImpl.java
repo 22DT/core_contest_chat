@@ -31,6 +31,15 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<UserDomain> getUsersByRoomId(Long roomId) {
+
+        return userJpaRepository.findUsersByRoomId(roomId)
+                .stream()
+                .map(User::toDomain)
+                .toList();
+    }
+
+    @Override
     public List<UserDomain> getUsers(Long teamId) {
         return userJpaRepository.findUsersByTeamId(teamId).stream()
                 .map(User::toDomain).toList();

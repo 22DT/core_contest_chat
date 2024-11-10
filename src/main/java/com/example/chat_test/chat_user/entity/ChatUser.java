@@ -5,6 +5,8 @@ import com.example.chat_test.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -26,5 +28,13 @@ public class ChatUser {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
+
+    private LocalDateTime lastAccessedAt;
+
+
+
+    public void updateLastAccessedAt() {
+        lastAccessedAt = LocalDateTime.now();
+    }
 
 }

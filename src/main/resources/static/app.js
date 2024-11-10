@@ -49,6 +49,7 @@ function disconnect() {
 
 function subscribe() {
     const destination = $("#destination").val(); // 입력된 구독 경로
+    const subscriptionId = $("#sub_subId").val(); // 원하는 subscription ID를 여기에 설정하세요.
 
     currentSubscription = stompClient.subscribe(
         destination,
@@ -59,7 +60,10 @@ function subscribe() {
             // name: content 형식으로 메시지 출력
             showGreeting(chatMessage.userId + ": [" + chatMessage.message + "] ["+chatMessage.createdAt+"]");
         },
-        { userId: $("#userId").val() } // userId를 헤더로 추가
+        {
+            userId: $("#userId").val(),
+            // id:subscriptionId
+        }
     );
 }
 

@@ -21,6 +21,7 @@ public class User {
     private Long teamId;
 
     private String nickname;
+    private String snsProfileImageUrl;
 
 
 

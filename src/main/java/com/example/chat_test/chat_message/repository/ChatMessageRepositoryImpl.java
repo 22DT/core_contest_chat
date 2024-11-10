@@ -10,9 +10,12 @@ import com.example.chat_test.chat_user.service.ChatUserRepository;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,16 +27,17 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
 
 
     @Override
-    public ChatMessage saveChatMessage(String message, MessageType type, UserDomain user, Long roomId) {
+    public ChatMessage saveChatMessage(String message, MessageType type, UserDomain user, Long roomId, Integer readCount) {
         ChatRoom chatRoom = chatRoomJpaRepository.getReferenceById(roomId);
         ChatUser chatUser = charUserRepository.getChatUser(roomId, user.getId());  //
 
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
-                .Writer(chatUser)
+                .chatUser(chatUser)
                 .message(message)
                 .createdAt(LocalDateTime.now())
+                .readCount(readCount)
                 .messageType(type)
                 .build();
 
@@ -42,7 +46,39 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
         return chatMessage;
     }
 
+    @Override
+    public void sendRoomCreationMessage(Long roomId) {
+        ChatRoom chatRoom = chatRoomJpaRepository.getReferenceById(roomId);
 
+        ChatMessage chatMessage = ChatMessage.builder()
+                .message("채팅방 생성!")
+                .chatRoom((chatRoom))
+                .createdAt(LocalDateTime.now())
+                .messageType(MessageType.ENTER)
+                .build();
+
+        chatMessageJpaRepository.save(chatMessage);
+    }
+
+    @Override
+    public Slice<ChatMessage> getChatMessages(Long roomId, LocalDateTime lastAccessedAt, Pageable pageable) {
+        return chatMessageJpaRepository.findChatMessageByRoomId(roomId, lastAccessedAt, pageable);
+    }
+
+    @Override
+    public ChatMessage getMostRecentMessage(Long roomId) {
+        Optional<ChatMessage> message = chatMessageJpaRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId);
+        return message.orElseThrow(()->new IllegalArgumentException("message is not found"));
+
+    }
+
+    @Override
+    public void incrementUnreadMessageCount(Long chatUserId, Long roomId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount) {
+        log.info("[saveChatMessage][incrementUnreadMessageCount]");
+        log.info("[incrementUnreadMessageCount][before]");
+        chatMessageJpaRepository.incrementUnreadMessageCount(chatUserId, roomId, newTime, oldTime, maxReadCount);
+        log.info("[incrementUnreadMessageCount][after]");
+    }
 
 
 }

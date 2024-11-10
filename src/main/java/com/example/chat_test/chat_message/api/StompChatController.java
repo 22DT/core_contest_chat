@@ -30,8 +30,6 @@ public class StompChatController  {
     private final ChatMessageService chatMessageService;
     private final SimpUserRegistry simpUserRegistry;
 
-
-
     @MessageMapping("/topic")
 //    @SendTo("topic/greetings")
     public void topic(@Payload ChatMessageRequest chatMessage) {
@@ -47,12 +45,18 @@ public class StompChatController  {
 
         ChatMessageResponse chatMessageResponse = chatMessageService.send(onlineUserIds,chatMessage, user);
 
-        template.convertAndSend("/topic/" + chatMessageResponse.roomId(), chatMessageResponse);
+        template.convertAndSend("/topic/" + chatMessage.roomId(), chatMessageResponse);
     }
 
     @MessageMapping("/queue")
     public void queue(@Payload ChatMessageRequest chatMessage) {
         log.info("[ChatController][queue]");
+
+        // 임시로
+        UserDomain user = UserDomain.builder()
+                .id(chatMessage.userId())
+                .build();
+
     }
 
 

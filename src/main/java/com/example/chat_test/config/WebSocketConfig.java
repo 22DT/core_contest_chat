@@ -25,8 +25,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
 
-    @Bean
+    /*@Bean
     public SubscriptionRegistry subscriptionRegistry() {
         return new DefaultSubscriptionRegistry();
-    }
+    }*/
 }

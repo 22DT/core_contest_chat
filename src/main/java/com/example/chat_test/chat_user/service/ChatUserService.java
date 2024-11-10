@@ -1,5 +1,6 @@
 package com.example.chat_test.chat_user.service;
 
+import com.example.chat_test.chat_user.dto.response.ChatUserResponse;
 import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,12 @@ public class ChatUserService {
         chatUserRepository.saveCharUsers(users, chatRoomId);
     }
 
-    public List<ChatUser> getChatUsers(Long roomId){
-        return chatUserRepository.getChatUsers(roomId);
+    public List<ChatUserResponse> getChatUsers(Long roomId){
+        List<ChatUser> chatUsers = chatUserRepository.getChatUsers(roomId);
+
+        return chatUsers.stream()
+                .map((chatUser)->new ChatUserResponse(chatUser.getId(), chatUser.getUser().getId()))
+                .toList();
     }
 
 
