@@ -6,6 +6,7 @@ import com.example.chat_test.chat_message.service.ChatMessageRepository;
 import com.example.chat_test.chat_room.entity.ChatRoom;
 import com.example.chat_test.chat_room.repository.ChatRoomJpaRepository;
 import com.example.chat_test.chat_user.entity.ChatUser;
+import com.example.chat_test.chat_user.repository.ChatUserJpaRepository;
 import com.example.chat_test.chat_user.service.ChatUserRepository;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     private final ChatMessageJpaRepository chatMessageJpaRepository;
     private final ChatRoomJpaRepository chatRoomJpaRepository;
     private final ChatUserRepository charUserRepository;
+    private final ChatUserJpaRepository chatUserJpaRepository;
 
 
     @Override
@@ -72,11 +74,13 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
 
     }
 
+
+
     @Override
-    public void incrementUnreadMessageCount(Long chatUserId, Long roomId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount) {
+    public void incrementUnreadMessageCount(Long roomId, Long chatUserId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount) {
         log.info("[saveChatMessage][incrementUnreadMessageCount]");
         log.info("[incrementUnreadMessageCount][before]");
-        chatMessageJpaRepository.incrementUnreadMessageCount(chatUserId, roomId, newTime, oldTime, maxReadCount);
+        chatMessageJpaRepository.incrementUnreadMessageCount(roomId, chatUserId, newTime, oldTime, maxReadCount);
         log.info("[incrementUnreadMessageCount][after]");
     }
 

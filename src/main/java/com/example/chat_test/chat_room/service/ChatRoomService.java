@@ -88,6 +88,10 @@ public class ChatRoomService {
         }
 
         // 마지막 접속 시간 갱신.
+        if(chatUser.isActive()){
+            throw new IllegalArgumentException("이미 채팅창 활성화 했음.");
+        }
+        chatUser.activeOn();
         LocalDateTime oldTime=chatUser.getLastAccessedAt();
         chatUser.updateLastAccessedAt();
         LocalDateTime newTime = chatUser.getLastAccessedAt();
@@ -95,7 +99,7 @@ public class ChatRoomService {
 
         // 읽지 않은 메시지 읽음 처리.
         Integer maxReadCount=chatUsers.size();
-        chatMessageRepository.incrementUnreadMessageCount(chatUser.getId(),chatRoomId, newTime, oldTime,  maxReadCount);
+        chatMessageRepository.incrementUnreadMessageCount(chatRoomId, chatUser.getId(), newTime, oldTime,  maxReadCount);
 
         // 메시지 갖고 온다.
         Slice<ChatMessage> chatMessages = chatMessageReader.getChatMessages(chatRoomId, user, 0, chatUser.getLastAccessedAt());

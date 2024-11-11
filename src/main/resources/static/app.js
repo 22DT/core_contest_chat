@@ -31,20 +31,26 @@ function setConnected(connected) {
 
 function connect() {
     stompClient.connectHeaders={
-        userId: $("#userId").val() // 커스텀 헤더로 userId 추가
+        userId: $("#conn_userId").val() // 커스텀 헤더로 userId 추가
     }
 
     stompClient.activate(); // WebSocket 연결 활성화
 }
 
 function disconnect() {
-    stompClient.deactivate();
+    stompClient.deactivate = function (param) {
+        $("#Disconnection_userId").val()
+    };
+
     setConnected(false);
     console.log("Disconnected");
+    /*
     if (currentSubscription) {
         currentSubscription.unsubscribe(); // 구독 해제
         currentSubscription = null; // 구독 변수 초기화
     }
+    * */
+
 }
 
 function subscribe() {
@@ -61,7 +67,7 @@ function subscribe() {
             showGreeting(chatMessage.userId + ": [" + chatMessage.message + "] ["+chatMessage.createdAt+"]");
         },
         {
-            userId: $("#userId").val(),
+            userId: $("#conn_userId").val(),
             // id:subscriptionId
         }
     );
@@ -72,7 +78,14 @@ function subscribe() {
 
 function unsubscribe() {
     const subscriptionId = $("#subscribeId").val(); // 원하는 subscription ID를 여기에 설정하세요.
-    stompClient.unsubscribe(subscriptionId)
+    const roomId=$("#unsub_roomId").val();
+    const userId=$("#unsub_userId").val();
+    stompClient.unsubscribe(subscriptionId,
+        {
+            roomId:roomId,
+            userId:userId
+        }
+    )
 }
 
 function sendMessage() {

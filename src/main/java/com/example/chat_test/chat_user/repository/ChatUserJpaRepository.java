@@ -32,4 +32,9 @@ public interface ChatUserJpaRepository extends JpaRepository<ChatUser, Long> {
             " where cu.user.id=:userId")
     List<ChatUser> findChatUsersByUserId(@Param("userId")Long userId);
 
+
+    @Query("select count(cu) from ChatUser cu" +
+            " where cu.chatRoom.id=:roomId and cu.isActive is true")
+    int findActiveChatUserCount(@Param("roomId")Long roomId);
+
 }

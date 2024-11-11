@@ -30,22 +30,21 @@ public class ChatMessageService {
     private final ChatMessageReader chatMessageReader;
 
 
-    public ChatMessageResponse send(List<Long> onlineChatUserIds, ChatMessageRequest chatMessageDto, UserDomain user) {
+
+    public ChatMessageResponse send(ChatMessageRequest chatMessageDto, UserDomain user) {
         Long roomId=chatMessageDto.roomId();
 
-        // 오프라인 유저를 찾는다.
-        List<Long> offlineUserIds = getOfflineUsers(onlineChatUserIds, roomId);
-        log.info("offlineUserIds= {}", offlineUserIds);
+        Integer activeChatUserCount = chatUserRepository.getActiveChatUserCount(roomId);
+        ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
 
-        log.info("[ChatMessageService][save]");
+        if(!chatUser.isActive()){
+            throw new IllegalArgumentException("채팅방을 켜놓지 않은 상태에서 메시지 전송할 수 없습니다.!");
+        }
         // 채팅 메시지 DB에 저장.
         MessageType messageType = chatMessageDto.messageType();
         String message = chatMessageDto.message();
 
-        ChatMessage chatMessage = chatMessageRepository.saveChatMessage(message, messageType, user, roomId, onlineChatUserIds.size());
-
-
-
+        ChatMessage chatMessage = chatMessageRepository.saveChatMessage(message, messageType, user, roomId, activeChatUserCount);
 
 
         return new ChatMessageResponse(user.getId(),user.getNickname(), user.getSnsProfileImageUrl(), message, messageType, -1, chatMessage.getCreatedAt());

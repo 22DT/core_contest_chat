@@ -9,5 +9,8 @@ public record ChatRoomResponse(
 
         Slice<ChatMessageResponse> messages
 
+
+//        String subId
+
 ) {
 }

@@ -29,12 +29,21 @@ public class ChatUser {
     @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
 
+    boolean isActive;
     private LocalDateTime lastAccessedAt;
 
 
 
     public void updateLastAccessedAt() {
         lastAccessedAt = LocalDateTime.now();
+    }
+
+    public void activeOn(){
+        isActive = true;
+    }
+
+    public void activeOff(){
+        isActive = false;
     }
 
 }

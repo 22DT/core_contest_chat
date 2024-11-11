@@ -12,12 +12,8 @@ public interface ChatMessageRepository {
     ChatMessage saveChatMessage(String message, MessageType type, UserDomain user, Long roomId, Integer readCount);
     void sendRoomCreationMessage(Long roomId);
 
-
     Slice<ChatMessage> getChatMessages(Long roomId, LocalDateTime lastAccessedAt, Pageable pageable);
-
     ChatMessage getMostRecentMessage(Long roomId);
 
-
-    void incrementUnreadMessageCount(Long chatUserId, Long roomId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount);
-
+    void incrementUnreadMessageCount(Long roomId, Long chatUserId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount);
 }

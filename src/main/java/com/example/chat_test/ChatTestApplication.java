@@ -60,7 +60,10 @@ SELECT DISTINCT room_id
 FROM CHAT_MESSAGE
 ORDER BY room_id, created_at DESC;
 
+select * from chat_user cu where cu.chat_room_id=1;
 
+SELECT * FROM CHAT_MESSAGE cm where cm.room_id=1
+order by cm.created_at desc;
 
 *
 * */

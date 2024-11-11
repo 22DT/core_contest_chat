@@ -11,15 +11,15 @@ import org.springframework.messaging.simp.broker.SubscriptionRegistry;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Slf4j
-@Controller
 @RequiredArgsConstructor
+@Component
 public class SessionSubscribeEventListener {
     private final SimpMessageSendingOperations template;
     private final SimpUserRegistry simpUserRegistry;

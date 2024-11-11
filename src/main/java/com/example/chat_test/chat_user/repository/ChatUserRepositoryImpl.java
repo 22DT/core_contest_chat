@@ -9,8 +9,6 @@ import com.example.chat_test.user.repository.UserJpaRepository;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -65,5 +63,10 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
         return chatUserJpaRepository.findChatUserByUserIdAndChatRoomId(userId, roomId)
                 .orElseThrow(() -> new IllegalArgumentException("ChatUser is not found"));
 
+    }
+
+    @Override
+    public Integer getActiveChatUserCount(Long roomId) {
+        return chatUserJpaRepository.findActiveChatUserCount(roomId);
     }
 }

@@ -30,12 +30,12 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
 
     @Modifying
     @Query("update ChatMessage message set message.readCount=message.readCount+1" +
-            " where message.chatUser.id=:chatUserId" +
-            " and message.chatRoom.id=:roomId" +
+            " where message.chatRoom.id=:roomId" +
+            " and message.chatUser.id != :chatUserId" +
             " and message.createdAt<=:newTime" +
             " and message.createdAt>:oldTime" +
             " and message.readCount<:maxReadCount")
-    void incrementUnreadMessageCount(@Param("chatUserId") Long chatUserId, @Param("roomId") Long roomId,
+    void incrementUnreadMessageCount(@Param("roomId") Long roomId, @Param("chatUserId") Long chatUserId,
                                      @Param("newTime") LocalDateTime newTime, @Param("oldTime") LocalDateTime oldTime,
                                      @Param("maxReadCount") Integer maxReadCount);
 

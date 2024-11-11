@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class StompChatController  {
     private final SimpMessageSendingOperations template;
     private final ChatMessageService chatMessageService;
-    private final SimpUserRegistry simpUserRegistry;
+    private final SimpUserRegistry simpUserRegistry;  // 그러고 보니 이거 같은 인스턴스 이용하는 건가?
 
     @MessageMapping("/topic")
 //    @SendTo("topic/greetings")
@@ -43,7 +43,7 @@ public class StompChatController  {
 
         List<Long> onlineUserIds = getOnlineUsers(chatMessage.roomId());
 
-        ChatMessageResponse chatMessageResponse = chatMessageService.send(onlineUserIds,chatMessage, user);
+        ChatMessageResponse chatMessageResponse = chatMessageService.send(chatMessage, user);
 
         template.convertAndSend("/topic/" + chatMessage.roomId(), chatMessageResponse);
     }

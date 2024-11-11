@@ -9,15 +9,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.broker.SubscriptionRegistry;
+import org.springframework.messaging.simp.user.SimpUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
+    private final SimpUserRegistry simpUserRegistry;
 
     @PostMapping("/api/group")
     public ResponseEntity<Long> createGroupChatRoom(@RequestParam("userId")Long userId,
@@ -42,6 +46,15 @@ public class ChatRoomController {
         return ResponseEntity.ok(privateChatRoom);
     }
 
+    /**
+     *
+     * @param roomId
+     * @param userId
+     * @return
+     *
+     * @apiNote
+     * 이미 채팅방 켜놓은 애 이거 막아야 함.
+     */
     @GetMapping("/api/chat-rooms/{room-id}")
     public ResponseEntity<ChatRoomResponse> getChatRoom(@PathVariable("room-id") Long roomId,
                                             @RequestParam("userId")Long userId) {
@@ -49,6 +62,7 @@ public class ChatRoomController {
         UserDomain user = UserDomain.builder()
                 .id(userId)
                 .build();
+
 
         ChatRoomResponse chatRoom = chatRoomService.getChatRoom(roomId, user);
         return ResponseEntity.ok(chatRoom);
@@ -65,4 +79,16 @@ public class ChatRoomController {
 
         return ResponseEntity.ok(chatRooms);
     }
+
+
+    /**
+     *
+     * @param userId
+     *
+     * 1: 채팅방 조회 세션연결 세션 종료 채팅방 닫기
+     * 2: 세션 연결 채팅방 조회 채팅방 닫디 세션 종료
+     *
+     * 어떤 게 좋을까?
+     */
+
 }

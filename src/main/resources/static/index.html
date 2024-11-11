@@ -14,19 +14,31 @@
     Javascript and reload this page!</h2></noscript>
 <div id="main-content" class="container">
     <div class="row">
-        <label for="userId">What is userId?</label>
-        <input type="text" id="userId" class="form-control" placeholder="userId">
-        <div class="col-md-6">
+        <div class="form-container" style="border: 1px solid rgba(221,221,221,0.58); padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+            <h3 style="margin-bottom: 20px; text-align: center;">Connection Frame</h3>
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="connect">WebSocket connection:</label>
-                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
-                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect</button>
+                    <label for="conn_userId">conn_userId:</label>
+                    <input type="text" id="conn_userId" class="form-control">
                 </div>
+                <button id="connect" class="btn btn-default" type="submit">Connect</button>
+
             </form>
         </div>
+        <div class="form-container" style="border: 1px solid rgba(221,221,221,0.58); padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+            <h3 style="margin-bottom: 20px; text-align: center;">DisConnection Frame</h3>
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="Disconnection_userId">Disconnection_userId:</label>
+                    <input type="text" id="Disconnection_userId" class="form-control">
+                </div>
+                <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect</button>
+
+            </form>
+        </div>
+
         <div class="col-md-6">
-            <div class="form-container" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+            <div class="form-container" style="border: 1px solid rgba(221,221,221,0.58); padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
                 <h3 style="margin-bottom: 20px; text-align: center;">Send Frame</h3>
                 <form class="form-inline">
                     <div class="form-group">
@@ -54,7 +66,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="form-container" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+            <div class="form-container" style="border: 1px solid rgba(221,221,221,0.58); padding: 20px; border-radius: 8px; background-color: #ffffff; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
                 <h3 style="margin-bottom: 20px; text-align: center;">Subscription Frame</h3>
                 <form class="form-inline">
                    <!-- <div class="form-group">
@@ -68,12 +80,20 @@
                     <button id="subscribe" class="btn btn-primary" type="button">Subscribe</button>
                 </form>
             </div>
-            <div class="form-container" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+            <div class="form-container" style="border: 1px solid rgba(221,221,221,0.58); padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
                 <h3 style="margin-bottom: 20px; text-align: center;">Unsubscription Frame</h3>
                 <form class="form-inline">
                     <div class="form-group">
-                        <label for="subscribeId">Subscribe Destination:</label>
-                        <input type="text" id="subscribeId" class="form-control" placeholder="[sub-0] 형식으로 넘겨야 합니다.">
+                        <label for="unsub_userId">userId:</label>
+                        <input type="text" id="unsub_userId" class="form-control" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="unsub_roomId">roomId:</label>
+                        <input type="text" id="unsub_roomId" class="form-control" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="subscribeId">subId:</label>
+                        <input type="text" id="subscribeId" class="form-control" placeholder="[sub-0]">
                     </div>
                     <button id="unsubscribe" class="btn btn-warning" type="button">Unsubscribe</button>
 
