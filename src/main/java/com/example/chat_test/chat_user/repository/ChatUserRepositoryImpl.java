@@ -65,8 +65,4 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
 
     }
 
-    @Override
-    public Integer getActiveChatUserCount(Long roomId) {
-        return chatUserJpaRepository.findActiveChatUserCount(roomId);
-    }
 }

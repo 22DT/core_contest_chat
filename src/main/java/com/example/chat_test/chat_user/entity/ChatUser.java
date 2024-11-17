@@ -11,11 +11,13 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Entity
-@NoArgsConstructor(access= PROTECTED)
+
+
 @Builder
 @AllArgsConstructor(access=PROTECTED)
 @Getter
+@Entity
+@NoArgsConstructor(access= PROTECTED)
 public class ChatUser {
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name="chat_user_id")
@@ -29,21 +31,10 @@ public class ChatUser {
     @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
 
-    boolean isActive;
     private LocalDateTime lastAccessedAt;
 
 
-
-    public void updateLastAccessedAt() {
-        lastAccessedAt = LocalDateTime.now();
+    public void updateLastAccessedAt(){
+        this.lastAccessedAt = LocalDateTime.now();
     }
-
-    public void activeOn(){
-        isActive = true;
-    }
-
-    public void activeOff(){
-        isActive = false;
-    }
-
 }

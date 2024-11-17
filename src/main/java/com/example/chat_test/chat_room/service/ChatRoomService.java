@@ -10,8 +10,11 @@ import com.example.chat_test.chat_room.ChatRoomType;
 import com.example.chat_test.chat_room.dto.response.ChatRoomPreviewResponse;
 import com.example.chat_test.chat_room.dto.response.ChatRoomResponse;
 import com.example.chat_test.chat_room.entity.ChatRoom;
+import com.example.chat_test.chat_user.ChatUserSession;
 import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.chat_user.service.ChatUserRepository;
+import com.example.chat_test.exception.chat_room.ChatRoomErrorCode;
+import com.example.chat_test.exception.chat_room.ChatRoomException;
 import com.example.chat_test.user.service.UserService;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
@@ -66,13 +69,17 @@ public class ChatRoomService {
      * @param user
      * @return
      *
-     * 1) lastAccessTime 갱신만 하면 될 듯?
+     * @apiNote
+     * 구독 유무 판단해야 하나? 이거 안 하면 readCount 흠흠..
      *
+     * 1) ChatUserSession 에 추가.
+     * 2) lastAccessedAt 갱신
+     * 3) 안 읽은 메시지 읽음 처리.
      *
      */
     public ChatRoomResponse getChatRoom(Long chatRoomId, UserDomain user) {
         log.info("[ChatRoomService][getChatRoom]");
-
+        Long userId = user.getId();
         // chatUser 찾아온다.
         List<ChatUser> chatUsers = chatUserRepository.getChatUsers(chatRoomId);
         ChatUser chatUser = null;
@@ -88,10 +95,10 @@ public class ChatRoomService {
         }
 
         // 마지막 접속 시간 갱신.
-        if(chatUser.isActive()){
-            throw new IllegalArgumentException("이미 채팅창 활성화 했음.");
-        }
-        chatUser.activeOn();
+        boolean active = ChatUserSession.isActive(userId, chatRoomId);
+        if(active){throw new ChatRoomException(ChatRoomErrorCode.DUPLICATED_CHAT_ROOM);}
+        ChatUserSession.onRoom(userId, chatRoomId);
+
         LocalDateTime oldTime=chatUser.getLastAccessedAt();
         chatUser.updateLastAccessedAt();
         LocalDateTime newTime = chatUser.getLastAccessedAt();
@@ -112,6 +119,12 @@ public class ChatRoomService {
                 chatMessageResponses
         );
 
+    }
+
+    public List<Long> getChatRoomIds(UserDomain user){
+        return chatRoomRepository.getChatRooms(user.getId()).stream()
+                .map(ChatRoom::getId)
+                .toList();
     }
 
 

@@ -29,31 +29,31 @@ insert into chat_room(chat_room_id, type) values(3, 'GROUP');
 insert into chat_room(chat_room_id, type) values(4, 'GROUP');
 insert into chat_room(chat_room_id, type) values(5, 'GROUP');
 
-insert into chat_user(chat_room_id, chat_user_id, user_id) values(1, 1, 1);
-insert into chat_user(chat_room_id, chat_user_id, user_id) values(2, 2, 1);
-insert into chat_user(chat_room_id, chat_user_id, user_id) values(3, 3, 1);
-insert into chat_user(chat_room_id, chat_user_id, user_id) values(4, 4, 1);
-insert into chat_user(chat_room_id, chat_user_id, user_id) values(5, 5, 1);
+insert into chat_user(is_active, chat_room_id, chat_user_id, user_id) values(true, 1, 1, 1);
+insert into chat_user(is_active,chat_room_id, chat_user_id, user_id) values(true, 2, 2, 1);
+insert into chat_user(is_active,chat_room_id, chat_user_id, user_id) values(true, 3, 3, 1);
+insert into chat_user(is_active,chat_room_id, chat_user_id, user_id) values(true, 4, 4, 1);
+insert into chat_user(is_active,chat_room_id, chat_user_id, user_id) values(true, 5, 5, 1);
 
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (1, NOW(), 1, 1, 'ㄱㄱ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (2, NOW(), 1, 1, 'ㄴㄴ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (3, NOW(), 1, 1, 'ㄷㄷ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (1, NOW(), 1, 1, 'ㄱㄱ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (2, NOW(), 1, 1, 'ㄴㄴ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (3, NOW(), 1, 1, 'ㄷㄷ', 'TALK');
 
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (4, NOW(), 2, 1, 'ㄱㄱ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (5, NOW(), 2, 1, 'ㄴㄴ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (6, NOW(), 2, 1, 'ㄷㄷ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (4, NOW(), 2, 1, 'ㄱㄱ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (5, NOW(), 2, 1, 'ㄴㄴ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (6, NOW(), 2, 1, 'ㄷㄷ', 'TALK');
 
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (7, NOW(), 3, 1, 'ㄱㄱ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (8, NOW(), 3, 1, 'ㄴㄴ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (9, NOW(), 3, 1, 'ㄷㄷ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (7, NOW(), 3, 1, 'ㄱㄱ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (8, NOW(), 3, 1, 'ㄴㄴ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (9, NOW(), 3, 1, 'ㄷㄷ', 'TALK');
 
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (10, NOW(), 4, 1, 'ㄱㄱ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (11, NOW(), 4, 1, 'ㄴㄴ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (12, NOW(), 4, 1, 'ㄷㄷ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (10, NOW(), 4, 1, 'ㄱㄱ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (11, NOW(), 4, 1, 'ㄴㄴ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (12, NOW(), 4, 1, 'ㄷㄷ', 'TALK');
 
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (13, NOW(), 5, 1, 'ㄱㄱ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (14, NOW(), 5, 1, 'ㄴㄴ', 'TALK');
-INSERT INTO chat_message(chat_message_id, created_at, room_id, writer_id, message, message_type) VALUES (15, NOW(), 5, 1, 'ㄷㄷ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (13, NOW(), 5, 1, 'ㄱㄱ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (14, NOW(), 5, 1, 'ㄴㄴ', 'TALK');
+INSERT INTO chat_message(chat_message_id, created_at, room_id, chat_user_id, message, message_type) VALUES (15, NOW(), 5, 1, 'ㄷㄷ', 'TALK');
 
 
 SELECT DISTINCT room_id
@@ -63,7 +63,7 @@ ORDER BY room_id, created_at DESC;
 select * from chat_user cu where cu.chat_room_id=1;
 
 SELECT * FROM CHAT_MESSAGE cm where cm.room_id=1
-order by cm.created_at desc;
+order by cm.created_at asc;
 
 *
 * */

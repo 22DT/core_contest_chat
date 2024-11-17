@@ -6,8 +6,11 @@ import com.example.chat_test.chat_message.dto.response.ChatMessageResponse;
 import com.example.chat_test.chat_message.entity.ChatMessage;
 import com.example.chat_test.chat_message.service.db.ChatMessageReader;
 import com.example.chat_test.chat_room.service.ChatRoomService;
+import com.example.chat_test.chat_user.ChatUserSession;
 import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.chat_user.service.ChatUserRepository;
+import com.example.chat_test.exception.chat_message.ChatMessageErrorCode;
+import com.example.chat_test.exception.chat_message.ChatMessageException;
 import com.example.chat_test.user.service.UserRepository;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
@@ -32,22 +35,25 @@ public class ChatMessageService {
 
 
     public ChatMessageResponse send(ChatMessageRequest chatMessageDto, UserDomain user) {
+        log.info("[ChatMessageService][send]");
         Long roomId=chatMessageDto.roomId();
 
-        Integer activeChatUserCount = chatUserRepository.getActiveChatUserCount(roomId);
-        ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
+        Long activeChatUserCount = ChatUserSession.getUserCount(roomId);
+        int i = activeChatUserCount.intValue();
+        boolean active = ChatUserSession.isActive(user.getId(), roomId);
 
-        if(!chatUser.isActive()){
-            throw new IllegalArgumentException("채팅방을 켜놓지 않은 상태에서 메시지 전송할 수 없습니다.!");
+        if(!active){
+            log.info("user not active");
+            throw new ChatMessageException(ChatMessageErrorCode.CANNOT_SEND_MESSAGE);
         }
         // 채팅 메시지 DB에 저장.
         MessageType messageType = chatMessageDto.messageType();
         String message = chatMessageDto.message();
 
-        ChatMessage chatMessage = chatMessageRepository.saveChatMessage(message, messageType, user, roomId, activeChatUserCount);
+        ChatMessage chatMessage = chatMessageRepository.saveChatMessage(message, messageType, user, roomId, i);
 
 
-        return new ChatMessageResponse(user.getId(),user.getNickname(), user.getSnsProfileImageUrl(), message, messageType, -1, chatMessage.getCreatedAt());
+        return new ChatMessageResponse(user.getId(),user.getNickname(), user.getSnsProfileImageUrl(), message, messageType, chatMessage.getReadCount(), chatMessage.getCreatedAt());
     }
 
     /**

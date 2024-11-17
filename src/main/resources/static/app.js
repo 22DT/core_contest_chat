@@ -64,7 +64,7 @@ function subscribe() {
             const chatMessage = JSON.parse(message.body);
 
             // name: content 형식으로 메시지 출력
-            showGreeting(chatMessage.userId + ": [" + chatMessage.message + "] ["+chatMessage.createdAt+"]");
+            showGreeting(chatMessage.userId + "::: [" + chatMessage.message + "] ["+chatMessage.readCount+"]["+chatMessage.createdAt+"]");
         },
         {
             userId: $("#conn_userId").val(),

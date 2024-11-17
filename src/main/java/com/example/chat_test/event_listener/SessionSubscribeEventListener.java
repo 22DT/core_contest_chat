@@ -70,9 +70,7 @@ public class SessionSubscribeEventListener {
         log.info("destination= {}", destination);
 
 
-
-
-        sendEntryMessage(message);
+//        sendEntryMessage(message);
     }
 
 

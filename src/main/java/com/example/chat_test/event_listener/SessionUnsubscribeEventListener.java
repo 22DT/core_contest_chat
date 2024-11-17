@@ -11,7 +11,6 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
-import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -26,9 +25,8 @@ public class SessionUnsubscribeEventListener {
      * @param event
      *
      * @apiNote
-     * lastAccessAt 갱신해야 함.
      */
-    @EventListener
+//    @EventListener
     public void onSessionUnsubscribe(SessionUnsubscribeEvent event) {
         log.info("[SessionUnsubscribeEventListener][onSessionUnsubscribe]");
         Message<byte[]> message = event.getMessage();
@@ -48,8 +46,6 @@ public class SessionUnsubscribeEventListener {
             log.info("roomId= {}", roomId);
 
             ChatUser chatUser = chatUserRepository.getChatUser(roomId, userId);
-            chatUser.updateLastAccessedAt();
-            chatUser.activeOff();
         }
         else{
 

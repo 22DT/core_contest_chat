@@ -28,18 +28,8 @@ public class ChatRoom {
     @Enumerated(STRING)
     private ChatRoomType type;
 
-    /*
-
-@OneToMany(mappedBy = "chatRoom", fetch = LAZY)
-    private List<NewMessageRoom> newMessageRooms = new ArrayList<>();
-    */
-
-
 
     @OneToMany(mappedBy = "chatRoom", fetch = LAZY)
     private List<ChatUser> chatUsers = new ArrayList<>();
-
-
-
 
 }

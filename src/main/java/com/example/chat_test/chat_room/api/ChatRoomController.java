@@ -3,18 +3,15 @@ package com.example.chat_test.chat_room.api;
 import com.example.chat_test.chat_room.dto.response.ChatRoomPreviewResponse;
 import com.example.chat_test.chat_room.dto.response.ChatRoomResponse;
 import com.example.chat_test.chat_room.service.ChatRoomService;
+import com.example.chat_test.chat_user.ChatUserSession;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.broker.SubscriptionRegistry;
-import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @Slf4j
@@ -66,6 +63,32 @@ public class ChatRoomController {
 
         ChatRoomResponse chatRoom = chatRoomService.getChatRoom(roomId, user);
         return ResponseEntity.ok(chatRoom);
+    }
+
+    @PostMapping("/api/rooms/{room-id}/close")
+    public ResponseEntity<Void> closeRoom(@PathVariable("room-id") Long roomId,
+                                          @RequestParam("userId")Long userId){
+
+        UserDomain user = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        ChatUserSession.offRoom(userId, roomId);
+
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/api/chat-rooms-ids")
+    public ResponseEntity<List<Long>> getChatRoomIds(@RequestParam("userId")Long userId) {
+
+        UserDomain user = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        List<Long> roomIds=chatRoomService.getChatRoomIds(user);
+
+        return ResponseEntity.ok().body(roomIds);
     }
 
 

@@ -79,6 +79,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     @Override
     public void incrementUnreadMessageCount(Long roomId, Long chatUserId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount) {
         log.info("[saveChatMessage][incrementUnreadMessageCount]");
+
         log.info("[incrementUnreadMessageCount][before]");
         chatMessageJpaRepository.incrementUnreadMessageCount(roomId, chatUserId, newTime, oldTime, maxReadCount);
         log.info("[incrementUnreadMessageCount][after]");

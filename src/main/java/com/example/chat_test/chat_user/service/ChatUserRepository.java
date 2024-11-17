@@ -13,6 +13,5 @@ public interface ChatUserRepository {
     List<ChatUser> getChatUsers(Long chatRoomId);
     List<ChatUser> getChatUsersByUserId(Long userId);
     ChatUser getChatUser(Long chatRoomId,Long userId);
-    Integer getActiveChatUserCount(Long roomId);
 
 }
