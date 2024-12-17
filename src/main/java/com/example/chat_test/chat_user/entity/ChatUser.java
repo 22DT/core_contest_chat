@@ -9,15 +9,15 @@ import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.InheritanceType.JOINED;
 import static lombok.AccessLevel.PROTECTED;
-
-
 
 @Builder
 @AllArgsConstructor(access=PROTECTED)
 @Getter
 @Entity
 @NoArgsConstructor(access= PROTECTED)
+@Inheritance(strategy=JOINED)
 public class ChatUser {
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name="chat_user_id")
@@ -33,8 +33,23 @@ public class ChatUser {
 
     private LocalDateTime lastAccessedAt;
 
+    private LocalDateTime lastJoinedAt;
+    private boolean isLeave;
+
+    public void leaveRoom(){
+        isLeave = true;
+    }
+
+
 
     public void updateLastAccessedAt(){
         this.lastAccessedAt = LocalDateTime.now();
     }
+
+    public void joinChatRoom(){
+        isLeave = false;
+        lastJoinedAt = LocalDateTime.now();
+    }
+
+
 }

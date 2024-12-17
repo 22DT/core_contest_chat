@@ -31,6 +31,7 @@ public class ChatUserSession {
     }
 
 
+    // 웹소켓 연결이랑 구독 안 된 유저 채팅방 조회 시켜야 하나?
     public static void onRoom(Long userId, Long roomId){
         log.info("[ChatUserSession][onRoom]");
         if(userAndRoom.containsKey(userId)){

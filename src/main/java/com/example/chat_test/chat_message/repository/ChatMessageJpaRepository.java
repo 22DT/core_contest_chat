@@ -9,14 +9,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Long> {
     @Query("select message from ChatMessage message" +
             " left join message.chatUser cu" +
             " left join cu.user" +
-            " where message.chatRoom.id=:roomId and message.createdAt <= :lastAccessedAt")
-    Slice<ChatMessage> findChatMessageByRoomId(@Param("roomId")Long roomId, @Param("lastAccessedAt") LocalDateTime lastAccessedAt, Pageable pageable);
+            " where message.chatRoom.id=:roomId and message.createdAt >=:lastJoinedAt and message.createdAt <= :lastAccessedAt")
+    Slice<ChatMessage> findChatMessageByRoomId(@Param("roomId")Long roomId, @Param("lastAccessedAt") LocalDateTime lastAccessedAt, @Param("lastJoinedAt") LocalDateTime lastJoinedAt, Pageable pageable);
 
 
 
@@ -26,6 +27,15 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
             " order by message.createdAt desc " +
             " limit  1")
     Optional<ChatMessage> findTopByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomId")Long chatRoomId);
+
+
+    @Query("select message from ChatMessage message" +
+            " left join message.chatUser cu" +
+            " left join cu.user" +
+            " where message.chatRoom.id=:roomId and message.createdAt>=:lastJoinedAt" +
+            " and message.messageType='IMAGE'" +
+            " order by message.createdAt asc ")
+    List<ChatMessage> findImagesByRoomId(@Param("roomId")Long roomId, @Param("lastJoinedAt") LocalDateTime lastJoinedAt);
 
 
     @Modifying
@@ -38,6 +48,13 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
     void incrementUnreadMessageCount(@Param("roomId") Long roomId, @Param("chatUserId") Long chatUserId,
                                      @Param("newTime") LocalDateTime newTime, @Param("oldTime") LocalDateTime oldTime,
                                      @Param("maxReadCount") Integer maxReadCount);
+
+
+
+    @Modifying
+    @Query("delete from ChatMessage message" +
+            " where message.chatRoom.id=:roomId")
+    void deleteChatMessagesByRoomId(@Param("roomId") Long roomId);
 
 
 

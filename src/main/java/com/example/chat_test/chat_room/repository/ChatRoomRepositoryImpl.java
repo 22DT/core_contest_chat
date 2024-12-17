@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,6 +42,11 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     @Override
     public List<ChatRoom> getChatRooms(Long userId) {
         return chatRoomJpaRepository.findChatRoomsByUserId(userId);
+    }
+
+    @Override
+    public void deleteChatRoom(Long chatRoomId) {
+        chatRoomJpaRepository.deleteById(chatRoomId);
     }
 
 

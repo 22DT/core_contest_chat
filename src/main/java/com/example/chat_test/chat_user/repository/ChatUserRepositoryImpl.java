@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -34,7 +35,9 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
             ChatUser chatUser = ChatUser.builder()
                     .chatRoom(chatRoom)
                     .user(proxyUser)
+                    .lastJoinedAt(LocalDateTime.now())
                     .lastAccessedAt(LocalDateTime.now())
+                    .isLeave(false)
                     .build();
 
             chatUsers.add(chatUser);
@@ -64,5 +67,31 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
                 .orElseThrow(() -> new IllegalArgumentException("ChatUser is not found"));
 
     }
+
+    @Override
+    public Optional<ChatUser> getChatUserById(Long chatRoomId, Long userId) {
+        return chatUserJpaRepository.findChatUserByUserIdAndChatRoomId(userId, chatRoomId);
+    }
+
+    @Override
+    public List<ChatUser> getPrivateChatUser(Long userId) {
+        return chatUserJpaRepository.findPrivateChatUserByUserId(userId);
+    }
+
+    @Override
+    public void deleteChatUser(Long chatRoomId, Long userId) {
+        chatUserJpaRepository.deleteChatUserByChatRoomAndUserId(chatRoomId, userId);
+    }
+
+    @Override
+    public void deleteChatUser(Long chatUserId) {
+        chatUserJpaRepository.deleteById(chatUserId);
+    }
+
+    @Override
+    public void deleteChatUsersByRoomId(Long roomId) {
+        chatUserJpaRepository.deleteChatUsersByChatRoomId(roomId);
+    }
+
 
 }

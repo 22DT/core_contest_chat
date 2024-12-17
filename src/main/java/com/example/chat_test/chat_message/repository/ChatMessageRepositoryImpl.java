@@ -11,11 +11,13 @@ import com.example.chat_test.chat_user.service.ChatUserRepository;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -63,8 +65,8 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     }
 
     @Override
-    public Slice<ChatMessage> getChatMessages(Long roomId, LocalDateTime lastAccessedAt, Pageable pageable) {
-        return chatMessageJpaRepository.findChatMessageByRoomId(roomId, lastAccessedAt, pageable);
+    public Slice<ChatMessage> getChatMessages(Long roomId, LocalDateTime lastJoinedAt, LocalDateTime lastAccessedAt, Pageable pageable) {
+        return chatMessageJpaRepository.findChatMessageByRoomId(roomId, lastAccessedAt, lastJoinedAt, pageable);
     }
 
     @Override
@@ -74,6 +76,10 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
 
     }
 
+    @Override
+    public List<ChatMessage> getImages(Long roomId, LocalDateTime lastJoinedAt) {
+        return chatMessageJpaRepository.findImagesByRoomId(roomId, lastJoinedAt);
+    }
 
 
     @Override
@@ -83,6 +89,11 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
         log.info("[incrementUnreadMessageCount][before]");
         chatMessageJpaRepository.incrementUnreadMessageCount(roomId, chatUserId, newTime, oldTime, maxReadCount);
         log.info("[incrementUnreadMessageCount][after]");
+    }
+
+    @Override
+    public void deleteMessagesByRoomId(Long roomId) {
+        chatMessageJpaRepository.deleteChatMessagesByRoomId(roomId);
     }
 
 

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
@@ -20,6 +21,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SessionConnectedEventListener {
     private final SimpUserRegistry simpUserRegistry;
+    private final SimpMessageSendingOperations template;
     private Long seq=0L;
 
     /**
@@ -28,6 +30,7 @@ public class SessionConnectedEventListener {
      *
      * @apiNote
      * 토큰 대신 header 에 userId 사용하자.
+     * 연결 성공헀으면 roomIds 뿌리자
      *
      */
 
@@ -43,6 +46,9 @@ public class SessionConnectedEventListener {
 
         Set<SimpUser> users = simpUserRegistry.getUsers();
         log.info("users= {}", users);
+
+        // 특정 세션에게 메시지 전송
+        //template.
     }
 
 

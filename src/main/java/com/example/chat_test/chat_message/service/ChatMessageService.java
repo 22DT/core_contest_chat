@@ -11,6 +11,8 @@ import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.chat_user.service.ChatUserRepository;
 import com.example.chat_test.exception.chat_message.ChatMessageErrorCode;
 import com.example.chat_test.exception.chat_message.ChatMessageException;
+import com.example.chat_test.exception.chat_user.ChatUserErrorCode;
+import com.example.chat_test.exception.chat_user.ChatUserException;
 import com.example.chat_test.user.service.UserRepository;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +44,14 @@ public class ChatMessageService {
         int i = activeChatUserCount.intValue();
         boolean active = ChatUserSession.isActive(user.getId(), roomId);
 
+        // 나간 유저인지 체크해줘야 하나?
+        ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
+
+        if(chatUser.isLeave()){
+            log.info("채팅방 참가자가 아님.");
+            throw new ChatUserException(ChatUserErrorCode.USER_NOT_PARTICIPANT);
+        }
+
         if(!active){
             log.info("user not active");
             throw new ChatMessageException(ChatMessageErrorCode.CANNOT_SEND_MESSAGE);
@@ -72,6 +82,8 @@ public class ChatMessageService {
      *
      * 읽은 메시지 처리도 필요함.
      * 프론트에서 페이징 정보를 어떻게 알지?
+     *
+     * 이거 뒤집어서 응답해야 하나?
      */
     public Slice<ChatMessageResponse> getChatMessages(Long roomId, UserDomain user, Integer page, LocalDateTime lastAccessedAt){
         log.info("[ChatMessageService][getChatMessages]");
@@ -79,6 +91,13 @@ public class ChatMessageService {
 
         return ChatMessageUtil.chatMessageToResponse(chatMessages);
     }
+
+    public List<ChatMessageResponse> getImages(Long roomId, UserDomain user){
+        List<ChatMessage> images = chatMessageReader.getImages(roomId,user);
+
+        return ChatMessageUtil.chatMessageToResponse(images);
+    }
+
 
     private List<Long> getOfflineUsers(List<Long> onlineUserIds, Long roomId){
         log.info("[ChatMessageService][getOfflineUsers]");

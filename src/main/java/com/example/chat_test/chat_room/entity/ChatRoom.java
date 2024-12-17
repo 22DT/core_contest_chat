@@ -28,7 +28,12 @@ public class ChatRoom {
     @Enumerated(STRING)
     private ChatRoomType type;
 
+    @OneToOne(fetch=LAZY)
+    @JoinColumn(name="contest_id")
+    private Contest contest;
 
+
+    @Builder.Default
     @OneToMany(mappedBy = "chatRoom", fetch = LAZY)
     private List<ChatUser> chatUsers = new ArrayList<>();
 

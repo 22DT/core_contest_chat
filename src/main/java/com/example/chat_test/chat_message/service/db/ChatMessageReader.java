@@ -24,21 +24,32 @@ public class ChatMessageReader {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatUserRepository chatUserRepository;
 
+    // 참가자인지 검증해야 하나??
+
 
     public Slice<ChatMessage> getChatMessages(Long roomId, UserDomain user, Integer page, LocalDateTime lastAccessedAt){
         log.info("[ChatMessageReader][getChatMessages]");
+        ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
 
         // 메시지들 조회
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         if(lastAccessedAt ==null){
-            ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
+
             lastAccessedAt=chatUser.getLastAccessedAt();
         }
 
-
-        return chatMessageRepository.getChatMessages(roomId, lastAccessedAt, pageable);
+        log.info("lastAccessedAt= {}", lastAccessedAt);
+        return chatMessageRepository.getChatMessages(roomId, chatUser.getLastJoinedAt(), lastAccessedAt, pageable);
     }
+
+    public List<ChatMessage> getImages(Long roomId, UserDomain user){
+        ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
+        List<ChatMessage> images = chatMessageRepository.getImages(roomId, chatUser.getLastJoinedAt());
+
+        return images;
+    }
+
 
 
 

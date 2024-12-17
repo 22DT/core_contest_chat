@@ -45,7 +45,6 @@ public class SessionUnsubscribeEventListener {
             log.info("userId= {}", userId);
             log.info("roomId= {}", roomId);
 
-            ChatUser chatUser = chatUserRepository.getChatUser(roomId, userId);
         }
         else{
 
