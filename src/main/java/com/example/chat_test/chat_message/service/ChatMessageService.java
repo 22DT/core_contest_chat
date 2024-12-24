@@ -63,7 +63,7 @@ public class ChatMessageService {
         ChatMessage chatMessage = chatMessageRepository.saveChatMessage(message, messageType, user, roomId, i);
 
 
-        return new ChatMessageResponse(user.getId(),user.getNickname(), user.getSnsProfileImageUrl(), message, messageType, chatMessage.getReadCount(), chatMessage.getCreatedAt());
+        return new ChatMessageResponse(user.getId(),user.getNickname(), user.getSnsProfileImageUrl(), null, message, messageType, chatMessage.getReadCount(), chatMessage.getCreatedAt());
     }
 
     /**

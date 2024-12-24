@@ -2,6 +2,7 @@ package com.example.chat_test.chat_room.entity;
 
 import com.example.chat_test.chat_room.ChatRoomType;
 import com.example.chat_test.chat_user.entity.ChatUser;
+import com.example.chat_test.team.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,8 +30,8 @@ public class ChatRoom {
     private ChatRoomType type;
 
     @OneToOne(fetch=LAZY)
-    @JoinColumn(name="contest_id")
-    private Contest contest;
+    @JoinColumn(name="team_id")
+    private Team team;
 
 
     @Builder.Default

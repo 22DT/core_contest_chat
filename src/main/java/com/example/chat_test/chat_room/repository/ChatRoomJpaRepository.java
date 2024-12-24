@@ -17,5 +17,15 @@ public interface ChatRoomJpaRepository extends JpaRepository<ChatRoom, Long> {
             " where cu.user.id=:userId")
     List<ChatRoom> findChatRoomsByUserId(@Param("userId")Long userId);
 
+    @Query("select room from ChatRoom room" +
+            " join fetch room.chatUsers cu" +
+            " join fetch cu.user" +
+            " where room.id=:roomId")
+    Optional<ChatRoom> findPrivateChatRoomById(@Param("roomId")Long roomId);
+
+
+
+    boolean existsByTeamId(Long TeamId);
+
 
 }

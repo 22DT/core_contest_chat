@@ -32,7 +32,7 @@ public class ChatMessageReader {
         ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
 
         // 메시지들 조회
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
 
         if(lastAccessedAt ==null){
 
@@ -49,6 +49,33 @@ public class ChatMessageReader {
 
         return images;
     }
+
+
+    public Slice<ChatMessage> searchChatMessages(Long roomId, UserDomain user, Integer page, String search, List<Long> findMessageIds) {
+        Slice<ChatMessage> chatMessages;
+        boolean isSearch = false;
+        boolean hasNextPage;
+
+        do {
+            chatMessages = getChatMessages(roomId, user, page, LocalDateTime.now());
+            hasNextPage = chatMessages.hasNext(); // `hasNext` 값 저장
+
+            for (ChatMessage chatMessage : chatMessages) {
+                String message = chatMessage.getMessage();
+
+                if (message.contains(search)) {
+                    isSearch = true;
+                    findMessageIds.add(chatMessage.getId());
+                }
+            }
+
+            if (!hasNextPage) break; // 다음 페이지가 없으면 종료
+            page++;
+        } while (!isSearch);
+
+        return chatMessages;
+    }
+
 
 
 

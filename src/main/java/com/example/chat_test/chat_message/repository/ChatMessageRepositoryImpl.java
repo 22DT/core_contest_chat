@@ -72,8 +72,13 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     @Override
     public ChatMessage getMostRecentMessage(Long roomId) {
         Optional<ChatMessage> message = chatMessageJpaRepository.findTopByChatRoomIdOrderByCreatedAtDesc(roomId);
-        return message.orElseThrow(()->new IllegalArgumentException("message is not found"));
+        return message.orElse(null);
 
+    }
+
+    @Override
+    public List<ChatMessage> getMostRecentMessages(List<Long> roomIds) {
+        return chatMessageJpaRepository.findTopsByChatRoomIdOrderByCreatedAtDesc(roomIds);
     }
 
     @Override

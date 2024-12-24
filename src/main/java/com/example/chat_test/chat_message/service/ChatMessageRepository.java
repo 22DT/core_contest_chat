@@ -15,6 +15,7 @@ public interface ChatMessageRepository {
 
     Slice<ChatMessage> getChatMessages(Long roomId, LocalDateTime lastJoinedAt, LocalDateTime lastAccessedAt, Pageable pageable);
     ChatMessage getMostRecentMessage(Long roomId);
+    List<ChatMessage> getMostRecentMessages(List<Long> roomIds);
     List<ChatMessage> getImages(Long roomId, LocalDateTime lastJoinedAt);
 
     void incrementUnreadMessageCount(Long roomId, Long chatUserId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount);

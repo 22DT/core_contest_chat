@@ -1,5 +1,6 @@
 package com.example.chat_test.chat_user;
 
+import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.exception.chat_room.ChatRoomErrorCode;
 import com.example.chat_test.exception.chat_room.ChatRoomException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,18 @@ public class ChatUserSession {
         }
 
         return true;
-
     }
+
+    public static boolean isActive(Long userId) {
+        log.info("[ChatUserSession][isActive]");
+        return userAndRoom.containsKey(userId);
+    }
+
+    public static Long getRoomId(Long userId){
+        log.info("[ChatUserSession][getRoomId]");
+        return userAndRoom.get(userId);
+    }
+
 
 
     // 웹소켓 연결이랑 구독 안 된 유저 채팅방 조회 시켜야 하나?
@@ -59,6 +70,17 @@ public class ChatUserSession {
         else{
             log.info("없는 채팅방을 왜 닫니?");
         }
+    }
+
+    public static void onRoom(ChatUser chatUser){
+        onRoom(chatUser.getUser().getId(), chatUser.getChatRoom().getId());
+        chatUser.updateLastAccessedAt();
+    }
+
+
+    public static void offRoom(ChatUser chatUser){
+        offRoom(chatUser.getUser().getId(), chatUser.getChatRoom().getId());
+        chatUser.updateLastAccessedAt();
     }
     
     // 채팅방 활성화한 유저의 수

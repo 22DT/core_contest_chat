@@ -9,10 +9,12 @@ import com.example.chat_test.chat_message.service.db.ChatMessageReader;
 import com.example.chat_test.chat_room.ChatRoomType;
 import com.example.chat_test.chat_room.dto.response.ChatRoomPreviewResponse;
 import com.example.chat_test.chat_room.dto.response.ChatRoomResponse;
+import com.example.chat_test.chat_room.dto.response.MessageSearchResponse;
 import com.example.chat_test.chat_room.entity.ChatRoom;
 import com.example.chat_test.chat_user.ChatUserSession;
 import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.chat_user.service.ChatUserRepository;
+import com.example.chat_test.chat_user.service.db.ChatUserReader;
 import com.example.chat_test.exception.chat_room.ChatRoomErrorCode;
 import com.example.chat_test.exception.chat_room.ChatRoomException;
 import com.example.chat_test.exception.chat_user.ChatUserErrorCode;
@@ -38,10 +40,27 @@ public class ChatRoomService {
     private final ChatUserRepository chatUserRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMessageReader chatMessageReader;
+    private final ChatUserReader chatUserReader;
 
 
-    // 중복 생성 막아야 해.
+    /**
+     *
+     * @param user
+     * @param teamId
+     * @return
+     *
+     * @apiNote
+     *
+     * 팀 당 그룹 채팅은 하나.
+     *
+     * if) 팀의 그룹 채팅방 존재
+     *  예외
+     * else if) 팀의 그룹 채팅방 없음
+     *  팀장 및 팀원들 조회해서 그룹채팅방 생성한다.
+     */
     public Long createGroupChatRoom(UserDomain user ,Long teamId) {
+        chatRoomRepository.existsChatRoomByTeamId(teamId);
+
         // team 의 유저를 모두 찾아온다. (팀장 포함?)
         List<UserDomain> teamUsers = userService.getUsersByTeam(teamId);
 
@@ -62,12 +81,15 @@ public class ChatRoomService {
      *
      * @apiNote
      *
-     * 똑같은 사람이랑 중복 채팅방 생성 허용?
-     * 상황: A, B 개인 채팅 중. A 나감 A, B 다시 채팅창 만듦. B는 A와의 기존 채팅방과 새 채팅방 두 개 전부 유지?
-     *
-     * 1) 둘 다 처음
-     * 2) 나는 나감. 상대방 안 나감.
-     * 3) 둘 다 나감.
+     * if) 둘 사이 개인 채팅방 존재
+     *  if) 둘 다 안 나감
+     *      예외
+     *  else if) user 나감 and target 안 나감
+     *      user 다시 참여시켜줌
+     *  else if) user 안 나감
+     *      예외
+     *  else if) 둘 다 나감 OR 처음
+     *      채팅방 만들어 줌.
      *
      */
     public Long createPrivateChatRoom(UserDomain user ,Long targetUserId) {
@@ -84,6 +106,7 @@ public class ChatRoomService {
         Long roomId = null;
         ChatUser myChatUser = null;
         ChatUser targetChatUser = null;
+
         for (ChatUser mCU : myChatUsers) {
             Long chatRoomId=mCU.getChatRoom().getId();
             boolean isFind=false;
@@ -101,7 +124,7 @@ public class ChatRoomService {
         }
 
         if(roomId==null){
-            // 같이 있는 채팅방이 없어. 1) or 3)
+            // 같이 있는 채팅방이 없어.
 
             // 채팅방 생성
             Long chatRoomId = chatRoomRepository.createChatRoom(ChatRoomType.PRIVATE);
@@ -116,10 +139,11 @@ public class ChatRoomService {
             // 나 나감 and 상대 안 나감.
             if(myChatUser.isLeave() && !targetChatUser.isLeave()){
                 myChatUser.joinChatRoom();
+                // 이때 메시지...음음음
             }
             // 나 안 나감
             else if(!myChatUser.isLeave()){
-                throw new ChatRoomException(ChatRoomErrorCode.DUPLICATED_CHAT_ROOM);
+                throw new ChatRoomException(ChatRoomErrorCode.CANNOT_CREATE_DUPLICATE_CHAT_ROOM);
             }
 
             return myChatUser.getChatRoom().getId();
@@ -218,8 +242,30 @@ public class ChatRoomService {
     }
 
 
+    /**
+     *
+     * @param user
+     * @return
+     *
+     * @apiNote
+     *
+     * 이거 처리하는 동안 발생한 메시지 프론트에서 갖고 있을 수 있나?
+     * 클라이언트 요청  (여기서 발생한 메시지들) 응답
+     */
     public List<ChatRoomPreviewResponse> getChatRooms(UserDomain user) {
         log.info("[ChatRoomService][getChatRooms]");
+
+        Long userId = user.getId();
+
+        // 현재 어떠한 채팅방도 열고 있으면 안 됨.
+        if(ChatUserSession.isActive(userId)){
+            Long roomId = ChatUserSession.getRoomId(userId);
+            log.info("채팅방 열려 있음: {}", roomId);
+
+            // 해당 채팅방을 닫는다.
+            ChatUser chatUser = chatUserRepository.getChatUser(roomId, userId);
+            ChatUserSession.offRoom(chatUser);
+        }
 
         // 채팅유저를 갖고 온다.
         List<ChatUser> chatUsers = chatUserRepository.getChatUsersByUserId(user.getId());
@@ -231,13 +277,36 @@ public class ChatRoomService {
         log.info("chatUsers.size()= {}", chatUsers.size());
 
 
-        // 각 채팅방들의 최근 메시지를 갖고 온다.  이거 N+1 생기는 거 같은데...
+        // 각 채팅방들의 최근 메시지를 갖고 온다.  이거 N+1 생기는 거 같은데... -> 한 번에 갖고 오기
         List<ChatMessage> mostRecentMessages = new ArrayList<>();
+
+        List<ChatMessage> mostRecentMessages1 = chatMessageRepository.getMostRecentMessages(roomMap.keySet().stream().toList());
+        Map<Long, ChatMessage> mostRecentMessageMap = new HashMap<>(); // <roomId, ChatMessage>
+        for (ChatMessage message : mostRecentMessages1) {
+            ChatRoom chatRoom = message.getChatRoom();
+            mostRecentMessageMap.put(chatRoom.getId(), message);
+        }
+
+
         for (ChatUser chatUser : chatUsers) {
             // 나가기한 채팅방 필터링.
-            if(chatUser.isLeave()){continue;}
+            if (chatUser.isLeave()) {continue;}
+
             ChatRoom chatRoom = chatUser.getChatRoom();
-            ChatMessage mostRecentMessage = chatMessageRepository.getMostRecentMessage(chatRoom.getId());
+            // ChatMessage mostRecentMessage = chatMessageRepository.getMostRecentMessage(chatRoom.getId());
+            ChatMessage mostRecentMessage = mostRecentMessageMap.get(chatRoom.getId());
+
+            // lastJoinedAt 이랑 비교해줘야 해.
+
+
+            // 가장 최근 메시지가 없어 || 내가 참여하기 이전 메시지가 가장 최근이야.-> 채팅방에 참여한 시간으로.
+            if (mostRecentMessage == null || chatUser.getLastJoinedAt().isAfter(mostRecentMessage.getCreatedAt())) {
+                mostRecentMessage = ChatMessage.builder()
+                        .messageType(MessageType.ENTER)
+                        .chatRoom(chatRoom)
+                        .createdAt(chatUser.getLastJoinedAt())
+                        .build();
+            }
 
             mostRecentMessages.add(mostRecentMessage);
         }
@@ -258,14 +327,39 @@ public class ChatRoomService {
 
             boolean isThereNewMessage = mostRecentMessage.getCreatedAt().isAfter(chatUser.getLastAccessedAt());
             if(mostRecentMessage.getMessageType()==MessageType.ENTER){isThereNewMessage=false;}
+            String roomName="roomName";
+            if(chatRoom.getType()==ChatRoomType.GROUP){
+                roomName="팀이름";
+            }
+            else if(chatRoom.getType()==ChatRoomType.PRIVATE){
+                ChatUser partner = chatUserReader.getPrivateChatRoomPartner(userId, chatRoom.getId());
+                roomName=partner.getUser().getNickname();
+            }
 
-            ChatRoomPreviewResponse preview = new ChatRoomPreviewResponse(chatRoom.getId(), "roomName", mostRecentMessage.getMessage(), chatRoom.getType(), isThereNewMessage);
+
+            ChatRoomPreviewResponse preview = new ChatRoomPreviewResponse(chatRoom.getId(), roomName, mostRecentMessage.getMessage(), chatRoom.getType(), isThereNewMessage);
             responses.add(preview);
         }
 
 
         return responses;
     }
+
+    public void closeRoom(UserDomain user, Long roomId){
+        ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
+        ChatUserSession.offRoom(chatUser);
+
+
+    }
+
+    public boolean flipNotification(UserDomain user, Long roomId){
+        ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
+        chatUser.flipNoti();
+
+        return chatUser.isNoti();
+    }
+
+
 
     // 세션 처리해줘야 함.
     // 구독 취소 후 나가기.
@@ -312,5 +406,16 @@ public class ChatRoomService {
             chatRoomRepository.deleteChatRoom(roomId);
 
         }
+    }
+
+
+    public MessageSearchResponse searchChatMessages(Long roomId, UserDomain user, Integer page, String search){
+        List<Long> messageIds=new ArrayList<>();
+
+        Slice<ChatMessage> chatMessages = chatMessageReader.searchChatMessages(roomId, user, page, search, messageIds);
+
+        Slice<ChatMessageResponse> chatMessageResponses = ChatMessageUtil.chatMessageToResponse(chatMessages);
+
+        return new MessageSearchResponse(chatMessageResponses, messageIds);
     }
 }

@@ -11,7 +11,10 @@ public enum ChatRoomErrorCode {
     CANNOT_LEAVE_CHAT_ROOM(HttpStatus.BAD_REQUEST, "Cannot leave a group chat room"),
     CANNOT_CREATE_SINGLE_CHAT_ROOM(HttpStatus.BAD_REQUEST, "Cannot create a chat room with only one user"),
     CANNOT_LEAVE_CHAT_ROOM_AGAIN(HttpStatus.BAD_REQUEST, "Cannot leave a chat room again after already leaving"),
-    CANNOT_VIEW_LEFT_CHAT_ROOM(HttpStatus.BAD_REQUEST, "Cannot view a chat room after leaving it");
+    CANNOT_VIEW_LEFT_CHAT_ROOM(HttpStatus.BAD_REQUEST, "Cannot view a chat room after leaving it"),
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "The chat room could not be found"),
+    CANNOT_CREATE_DUPLICATE_CHAT_ROOM(HttpStatus.CONFLICT, "Cannot create a duplicate chat room");
+
 
     private final HttpStatus status;
     private final String message;

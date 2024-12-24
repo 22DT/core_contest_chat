@@ -2,8 +2,10 @@ package com.example.chat_test.chat_room.api;
 
 import com.example.chat_test.chat_room.dto.response.ChatRoomPreviewResponse;
 import com.example.chat_test.chat_room.dto.response.ChatRoomResponse;
+import com.example.chat_test.chat_room.dto.response.MessageSearchResponse;
 import com.example.chat_test.chat_room.service.ChatRoomService;
 import com.example.chat_test.chat_user.ChatUserSession;
+import com.example.chat_test.chat_user.service.ChatUserService;
 import com.example.chat_test.user.service.data.UserDomain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import java.util.List;
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final SimpUserRegistry simpUserRegistry;
+    private final ChatUserService chatUserService;
 
     @PostMapping("/api/rooms/group")
     public ResponseEntity<Long> createGroupChatRoom(@RequestParam("userId")Long userId,
@@ -74,7 +77,7 @@ public class ChatRoomController {
                 .id(userId)
                 .build();
 
-        ChatUserSession.offRoom(userId, roomId);
+        chatRoomService.closeRoom(user, roomId);
 
 
         return ResponseEntity.noContent().build();
@@ -104,6 +107,20 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRooms);
     }
 
+    @PutMapping("/api/rooms/{room-id}/flip")
+    public ResponseEntity<Boolean> flipNotification(@PathVariable("room-id") Long roomId,
+                                            @RequestParam("userId")Long userId){
+        UserDomain user = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        boolean b = chatRoomService.flipNotification(user, roomId);
+
+
+        return ResponseEntity.ok(b);
+
+    }
+
 
     @DeleteMapping("/api/rooms/{room-id}/leave")
     public ResponseEntity<Void> leaveRoom(@PathVariable("room-id") Long roomId,
@@ -117,6 +134,20 @@ public class ChatRoomController {
 
         return ResponseEntity.noContent().build();
 
+    }
+
+    @GetMapping("/api/rooms/{room-id}/search")
+    public ResponseEntity<MessageSearchResponse> searchMessages(@PathVariable("room-id") Long roomId,
+                                                                @RequestParam("page") Integer page,
+                                                                @RequestParam("q") String search,
+                                                                @RequestParam("userId")Long userId){
+        UserDomain user = UserDomain.builder()
+                .id(userId)
+                .build();
+
+        MessageSearchResponse messageSearchResponse = chatRoomService.searchChatMessages(roomId, user, page, search);
+
+        return ResponseEntity.ok(messageSearchResponse);
     }
 
 }

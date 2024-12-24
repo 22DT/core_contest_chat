@@ -5,6 +5,8 @@ import com.example.chat_test.chat_room.entity.ChatRoom;
 import com.example.chat_test.chat_room.service.ChatRoomRepository;
 import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.chat_user.repository.ChatUserJpaRepository;
+import com.example.chat_test.exception.chat_room.ChatRoomErrorCode;
+import com.example.chat_test.exception.chat_room.ChatRoomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -40,6 +42,12 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     }
 
     @Override
+    public ChatRoom getPrivateChatRoom(Long chatRoomId) {
+        return chatRoomJpaRepository.findById(chatRoomId)
+                .orElseThrow(()->new ChatRoomException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
+    }
+
+    @Override
     public List<ChatRoom> getChatRooms(Long userId) {
         return chatRoomJpaRepository.findChatRoomsByUserId(userId);
     }
@@ -47,6 +55,11 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     @Override
     public void deleteChatRoom(Long chatRoomId) {
         chatRoomJpaRepository.deleteById(chatRoomId);
+    }
+
+    @Override
+    public boolean existsChatRoomByTeamId(Long teamId) {
+        return chatRoomJpaRepository.existsByTeamId(teamId);
     }
 
 

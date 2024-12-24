@@ -24,9 +24,16 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
     @Query("select message from ChatMessage message" +
             " join fetch message.chatRoom" +
             " where message.chatRoom.id=:chatRoomId" +
-            " order by message.createdAt desc " +
+            " order by message.id desc " +
             " limit  1")
     Optional<ChatMessage> findTopByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomId")Long chatRoomId);
+
+    @Query("select message from ChatMessage message" +
+            " join fetch message.chatRoom" +
+            " where message.chatRoom.id in :chatRoomIds" +
+            " order by message.id desc " +
+            " limit  1")
+    List<ChatMessage> findTopsByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomIds")List<Long> chatRoomIds);
 
 
     @Query("select message from ChatMessage message" +
@@ -34,7 +41,7 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
             " left join cu.user" +
             " where message.chatRoom.id=:roomId and message.createdAt>=:lastJoinedAt" +
             " and message.messageType='IMAGE'" +
-            " order by message.createdAt asc ")
+            " order by message.id asc ")
     List<ChatMessage> findImagesByRoomId(@Param("roomId")Long roomId, @Param("lastJoinedAt") LocalDateTime lastJoinedAt);
 
 

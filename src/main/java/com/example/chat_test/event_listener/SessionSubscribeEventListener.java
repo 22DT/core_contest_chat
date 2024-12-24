@@ -94,7 +94,7 @@ public class SessionSubscribeEventListener {
         log.info("users: {}", users);
 
         Long roomId = getRoomId(destination);
-        ChatMessageResponse msg = new ChatMessageResponse(Long.valueOf(userId), "nickname","profileUrl", "입장!", MessageType.ENTER, -1, LocalDateTime.now());
+        ChatMessageResponse msg = new ChatMessageResponse(Long.valueOf(userId), "nickname","profileUrl", null, "입장!", MessageType.ENTER, -1, LocalDateTime.now());
         template.convertAndSend(destination, msg);
     }
 

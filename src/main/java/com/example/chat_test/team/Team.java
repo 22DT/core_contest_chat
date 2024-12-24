@@ -1,7 +1,6 @@
-package com.example.chat_test.chat_room.entity;
+package com.example.chat_test.team;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -13,12 +12,12 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Builder
 @AllArgsConstructor(access = PROTECTED)
-public class Contest {
+public class Team {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @Column(name="contest_id")
+    @Column(name="team_id")
     private Long id;
 
-    private String title;
+    private String name;
 
 }

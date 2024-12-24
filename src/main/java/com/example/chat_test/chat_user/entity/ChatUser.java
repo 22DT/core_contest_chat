@@ -32,15 +32,23 @@ public class ChatUser {
     private ChatRoom chatRoom;
 
     private LocalDateTime lastAccessedAt;
-
     private LocalDateTime lastJoinedAt;
+
+//    private Long lastReadMessageId;
+//    private Long firstReadMessageId;
+
     private boolean isLeave;
+    private boolean isNoti;
+
+//    private String imageUrl;   // 개인일 경우 상대방 프사, 팀일 경우 어떤 사진?
+
+    public void flipNoti(){
+        isNoti= !isNoti;
+    }
 
     public void leaveRoom(){
         isLeave = true;
     }
-
-
 
     public void updateLastAccessedAt(){
         this.lastAccessedAt = LocalDateTime.now();
