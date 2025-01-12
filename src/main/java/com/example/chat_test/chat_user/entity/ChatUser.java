@@ -31,11 +31,11 @@ public class ChatUser {
     @JoinColumn(name="chat_room_id")
     private ChatRoom chatRoom;
 
-    private LocalDateTime lastAccessedAt;
-    private LocalDateTime lastJoinedAt;
+//    private LocalDateTime lastAccessedAt;
+//    private LocalDateTime lastJoinedAt;
 
-//    private Long lastReadMessageId;
-//    private Long firstReadMessageId;
+    private Long lastReadMessageId;
+    private Long joinMessageId;
 
     private boolean isLeave;
     private boolean isNoti;
@@ -50,13 +50,18 @@ public class ChatUser {
         isLeave = true;
     }
 
-    public void updateLastAccessedAt(){
-        this.lastAccessedAt = LocalDateTime.now();
+    public void updateLastReadMessageId(Long lastReadMessageId){
+        this.lastReadMessageId = lastReadMessageId;
     }
 
-    public void joinChatRoom(){
+
+//    public void updateLastAccessedAt(){
+//        this.lastAccessedAt = LocalDateTime.now();
+//    }
+
+    public void joinChatRoom(Long joinMessageId){
         isLeave = false;
-        lastJoinedAt = LocalDateTime.now();
+        this.joinMessageId = joinMessageId;
     }
 
 

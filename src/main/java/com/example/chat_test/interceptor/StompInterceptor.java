@@ -23,8 +23,9 @@ public class StompInterceptor implements ChannelInterceptor {
         String userId = accessor.getFirstNativeHeader("userId");
 
         log.info("[StompInterceptor][preSend]");
-        log.info("command: " + command);
-        log.info("userId: " + userId);
+        log.info("command= {}" ,command);
+        log.info("userId= {}", userId);
+        log.info("channel= {}", channel);
 
         if (StompCommand.CONNECT == accessor.getCommand()) { // websocket 연결요청
 

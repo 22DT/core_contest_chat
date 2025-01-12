@@ -11,14 +11,14 @@ import java.util.List;
 
 public interface ChatMessageRepository {
     ChatMessage saveChatMessage(String message, MessageType type, UserDomain user, Long roomId, Integer readCount);
-    void sendRoomCreationMessage(Long roomId);
+    ChatMessage createEntryMessage(String message, MessageType type, Long roomId);
 
-    Slice<ChatMessage> getChatMessages(Long roomId, LocalDateTime lastJoinedAt, LocalDateTime lastAccessedAt, Pageable pageable);
+    Slice<ChatMessage> getChatMessages(Long roomId, Long startMessageId, Long lastMessageId, Pageable pageable);
     ChatMessage getMostRecentMessage(Long roomId);
     List<ChatMessage> getMostRecentMessages(List<Long> roomIds);
-    List<ChatMessage> getImages(Long roomId, LocalDateTime lastJoinedAt);
+    List<ChatMessage> getImages(Long roomId, Long startMessageId);
 
-    void incrementUnreadMessageCount(Long roomId, Long chatUserId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount);
+    void incrementUnreadMessageCount(Long roomId, Long chatUserId,Long oldLastReadMessageId,  Long newLastReadMessageId, Integer maxReadCount);
 
     void deleteMessagesByRoomId(Long roomId);
 }

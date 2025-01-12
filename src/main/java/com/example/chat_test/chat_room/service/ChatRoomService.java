@@ -64,11 +64,15 @@ public class ChatRoomService {
         // team 의 유저를 모두 찾아온다. (팀장 포함?)
         List<UserDomain> teamUsers = userService.getUsersByTeam(teamId);
 
-        // 채팅방 생성
+        // 채팅방 생성 이거 팀도 넘겨줘야 해.
         Long chatRoomId = chatRoomRepository.createChatRoom(ChatRoomType.GROUP);
+
+        // 입장 메시지 생성.
+        ChatMessage entryMessage = chatMessageRepository.createEntryMessage("채팅방 생성!", MessageType.ENTER, chatRoomId);
+
         // 채팅 유저 생성.
-        chatUserRepository.saveCharUsers(teamUsers,chatRoomId);
-        chatMessageRepository.sendRoomCreationMessage(chatRoomId);
+        chatUserRepository.saveChatUsers(teamUsers,chatRoomId, entryMessage.getId());
+
 
         return chatRoomId ;
     }
@@ -128,17 +132,25 @@ public class ChatRoomService {
 
             // 채팅방 생성
             Long chatRoomId = chatRoomRepository.createChatRoom(ChatRoomType.PRIVATE);
-            // 채팅 유저 생성.
-            chatUserRepository.saveCharUsers(List.of(user,targetUser),chatRoomId);
 
-            chatMessageRepository.sendRoomCreationMessage(chatRoomId);
+            // 입장 메시지 생성.
+            ChatMessage entryMessage = chatMessageRepository.createEntryMessage("입장!", MessageType.ENTER, chatRoomId);
+
+            // 채팅 유저 생성.
+            chatUserRepository.saveChatUsers(List.of(user,targetUser),chatRoomId, entryMessage.getId());
+
+
 
             return chatRoomId;
         }
         else{
             // 나 나감 and 상대 안 나감.
             if(myChatUser.isLeave() && !targetChatUser.isLeave()){
-                myChatUser.joinChatRoom();
+                ChatRoom chatRoom = myChatUser.getChatRoom();
+                // 입장 메시지 생성.
+                ChatMessage entryMessage = chatMessageRepository.createEntryMessage("입장!", MessageType.ENTER, chatRoom.getId());
+
+                myChatUser.joinChatRoom(entryMessage.getId());
                 // 이때 메시지...음음음
             }
             // 나 안 나감
@@ -188,25 +200,26 @@ public class ChatRoomService {
             throw new ChatRoomException(ChatRoomErrorCode.CANNOT_VIEW_LEFT_CHAT_ROOM);
         }
 
-        // 마지막 접속 시간 갱신.
+        // lastReadMessageId 갱신.
         boolean active = ChatUserSession.isActive(userId, chatRoomId);
         if(active){throw new ChatRoomException(ChatRoomErrorCode.DUPLICATED_CHAT_ROOM);}
         ChatUserSession.onRoom(userId, chatRoomId);
 
-        LocalDateTime oldTime=chatUser.getLastAccessedAt();
-        chatUser.updateLastAccessedAt();
-        LocalDateTime newTime = chatUser.getLastAccessedAt();
+        Long oldLastReadMessageId=chatUser.getLastReadMessageId();
+        ChatMessage mostRecentMessage = chatMessageRepository.getMostRecentMessage(chatRoomId);
+        Long newLastReadMessageId = mostRecentMessage.getId();
+        chatUser.updateLastReadMessageId(newLastReadMessageId);
 
-        log.info("oldAccessedTime= {}", oldTime);
-        log.info("newAccessedTime= {}", newTime);
+        log.info("oldLastReadMessageId= {}", oldLastReadMessageId);
+        log.info("newLastReadMessageId= {}", newLastReadMessageId);
 
 
         // 읽지 않은 메시지 읽음 처리.
         Integer maxReadCount=chatUsers.size();
-        chatMessageRepository.incrementUnreadMessageCount(chatRoomId, chatUser.getId(), newTime, oldTime,  maxReadCount);
+        chatMessageRepository.incrementUnreadMessageCount(chatRoomId, chatUser.getId(), oldLastReadMessageId, newLastReadMessageId,  maxReadCount);
 
         // 메시지 갖고 온다.
-        Slice<ChatMessage> chatMessages = chatMessageReader.getChatMessages(chatRoomId, user, 0, chatUser.getLastAccessedAt());
+        Slice<ChatMessage> chatMessages = chatMessageReader.getChatMessages(chatRoomId, user, 0);
 
         Slice<ChatMessageResponse> chatMessageResponses = ChatMessageUtil.chatMessageToResponse(chatMessages);
 
@@ -265,6 +278,7 @@ public class ChatRoomService {
             // 해당 채팅방을 닫는다.
             ChatUser chatUser = chatUserRepository.getChatUser(roomId, userId);
             ChatUserSession.offRoom(chatUser);
+            closeRoom(user,roomId);
         }
 
         // 채팅유저를 갖고 온다.
@@ -300,13 +314,13 @@ public class ChatRoomService {
 
 
             // 가장 최근 메시지가 없어 || 내가 참여하기 이전 메시지가 가장 최근이야.-> 채팅방에 참여한 시간으로.
-            if (mostRecentMessage == null || chatUser.getLastJoinedAt().isAfter(mostRecentMessage.getCreatedAt())) {
+            /*if (mostRecentMessage == null || chatUser.getLastJoinedAt().isAfter(mostRecentMessage.getCreatedAt())) {
                 mostRecentMessage = ChatMessage.builder()
                         .messageType(MessageType.ENTER)
                         .chatRoom(chatRoom)
                         .createdAt(chatUser.getLastJoinedAt())
                         .build();
-            }
+            }*/
 
             mostRecentMessages.add(mostRecentMessage);
         }
@@ -325,7 +339,7 @@ public class ChatRoomService {
             ChatRoom chatRoom = roomMap.get(mostRecentMessage.getChatRoom().getId());
             ChatUser chatUser = chatUserMap.get(chatRoom.getId());
 
-            boolean isThereNewMessage = mostRecentMessage.getCreatedAt().isAfter(chatUser.getLastAccessedAt());
+            boolean isThereNewMessage = mostRecentMessage.getId() > (chatUser.getLastReadMessageId());
             if(mostRecentMessage.getMessageType()==MessageType.ENTER){isThereNewMessage=false;}
             String roomName="roomName";
             if(chatRoom.getType()==ChatRoomType.GROUP){
@@ -347,6 +361,9 @@ public class ChatRoomService {
 
     public void closeRoom(UserDomain user, Long roomId){
         ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
+        ChatMessage mostRecentMessage = chatMessageRepository.getMostRecentMessage(roomId);
+        chatUser.updateLastReadMessageId(mostRecentMessage.getId());
+
         ChatUserSession.offRoom(chatUser);
 
 
@@ -418,4 +435,24 @@ public class ChatRoomService {
 
         return new MessageSearchResponse(chatMessageResponses, messageIds);
     }
+
+    public void addUserToChatRoom(Long targetUserId, Long roomId){
+        ChatRoom chatRoom = chatRoomRepository.getChatRoom(roomId);
+
+        if(chatRoom.getType()==ChatRoomType.PRIVATE){
+            throw new ChatRoomException(ChatRoomErrorCode.CANNOT_JOIN_PRIVATE_CHAT_ROOM);
+        }
+        chatUserRepository.getChatUserById(roomId, targetUserId)
+                .ifPresent(chatUser -> {
+                    throw new ChatRoomException(ChatRoomErrorCode.ALREADY_JOINED_CHAT_ROOM);
+                });
+
+
+        // 입장 메시지 생성.
+        ChatMessage entryMessage = chatMessageRepository.createEntryMessage("입장!", MessageType.ENTER, roomId);
+
+        // 채팅 유저 생성.
+        chatUserRepository.saveChatUsers(List.of(UserDomain.builder().id(targetUserId).build()),roomId, entryMessage.getId());
+    }
+
 }

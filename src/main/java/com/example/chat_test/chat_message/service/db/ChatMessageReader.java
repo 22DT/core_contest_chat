@@ -27,25 +27,20 @@ public class ChatMessageReader {
     // 참가자인지 검증해야 하나??
 
 
-    public Slice<ChatMessage> getChatMessages(Long roomId, UserDomain user, Integer page, LocalDateTime lastAccessedAt){
+    public Slice<ChatMessage> getChatMessages(Long roomId, UserDomain user, Integer page){
         log.info("[ChatMessageReader][getChatMessages]");
         ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
 
         // 메시지들 조회
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"));
 
-        if(lastAccessedAt ==null){
 
-            lastAccessedAt=chatUser.getLastAccessedAt();
-        }
-
-        log.info("lastAccessedAt= {}", lastAccessedAt);
-        return chatMessageRepository.getChatMessages(roomId, chatUser.getLastJoinedAt(), lastAccessedAt, pageable);
+        return chatMessageRepository.getChatMessages(roomId, chatUser.getJoinMessageId(), chatUser.getLastReadMessageId(), pageable);
     }
 
     public List<ChatMessage> getImages(Long roomId, UserDomain user){
         ChatUser chatUser = chatUserRepository.getChatUser(roomId, user.getId());
-        List<ChatMessage> images = chatMessageRepository.getImages(roomId, chatUser.getLastJoinedAt());
+        List<ChatMessage> images = chatMessageRepository.getImages(roomId, chatUser.getJoinMessageId());
 
         return images;
     }
@@ -57,7 +52,7 @@ public class ChatMessageReader {
         boolean hasNextPage;
 
         do {
-            chatMessages = getChatMessages(roomId, user, page, LocalDateTime.now());
+            chatMessages = getChatMessages(roomId, user, page);
             hasNextPage = chatMessages.hasNext(); // `hasNext` 값 저장
 
             for (ChatMessage chatMessage : chatMessages) {

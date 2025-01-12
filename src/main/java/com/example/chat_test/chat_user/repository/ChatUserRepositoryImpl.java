@@ -25,7 +25,7 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
     private final ChatRoomJpaRepository chatRoomJpaRepository;
 
     @Override
-    public void saveCharUsers(List<UserDomain> users, Long chatRoomId) {
+    public void saveChatUsers(List<UserDomain> users, Long chatRoomId, Long startMessageId) {
         List<ChatUser> chatUsers = new ArrayList<>();
 
         ChatRoom chatRoom = chatRoomJpaRepository.getReferenceById(chatRoomId);
@@ -35,8 +35,8 @@ public class ChatUserRepositoryImpl implements ChatUserRepository {
             ChatUser chatUser = ChatUser.builder()
                     .chatRoom(chatRoom)
                     .user(proxyUser)
-                    .lastJoinedAt(LocalDateTime.now())
-                    .lastAccessedAt(LocalDateTime.now())
+                    .joinMessageId(startMessageId)
+                    .lastReadMessageId(startMessageId)
                     .isLeave(false)
                     .build();
 

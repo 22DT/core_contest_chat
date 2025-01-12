@@ -150,4 +150,13 @@ public class ChatRoomController {
         return ResponseEntity.ok(messageSearchResponse);
     }
 
+    @PostMapping("/test/addUserToChatRoom")
+    public ResponseEntity<Void> addUserToChatRoom(@RequestParam("targetUserId")Long targetUserId,
+                                                  @RequestParam("roomId") Long roomId){
+
+        chatRoomService.addUserToChatRoom(targetUserId, roomId);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -20,6 +20,8 @@ import static lombok.AccessLevel.PROTECTED;
 @AllArgsConstructor(access = PROTECTED)
 @Getter
 public class ChatMessage {
+
+    // **무조건 자동 증가 전략 사용해야 함.**
     @Id @GeneratedValue(strategy = IDENTITY)
     @Column(name = "chat_message_id")
     private Long id;

@@ -66,6 +66,8 @@ public class ChatMessageService {
         return new ChatMessageResponse(user.getId(),user.getNickname(), user.getSnsProfileImageUrl(), null, message, messageType, chatMessage.getReadCount(), chatMessage.getCreatedAt());
     }
 
+
+
     /**
      * 특정 채팅방의 메시지들 조회.
      * @param roomId
@@ -87,7 +89,7 @@ public class ChatMessageService {
      */
     public Slice<ChatMessageResponse> getChatMessages(Long roomId, UserDomain user, Integer page, LocalDateTime lastAccessedAt){
         log.info("[ChatMessageService][getChatMessages]");
-        Slice<ChatMessage> chatMessages = chatMessageReader.getChatMessages(roomId, user, page, lastAccessedAt);
+        Slice<ChatMessage> chatMessages = chatMessageReader.getChatMessages(roomId, user, page);
 
         return ChatMessageUtil.chatMessageToResponse(chatMessages);
     }

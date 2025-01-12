@@ -16,8 +16,8 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
     @Query("select message from ChatMessage message" +
             " left join message.chatUser cu" +
             " left join cu.user" +
-            " where message.chatRoom.id=:roomId and message.createdAt >=:lastJoinedAt and message.createdAt <= :lastAccessedAt")
-    Slice<ChatMessage> findChatMessageByRoomId(@Param("roomId")Long roomId, @Param("lastAccessedAt") LocalDateTime lastAccessedAt, @Param("lastJoinedAt") LocalDateTime lastJoinedAt, Pageable pageable);
+            " where message.chatRoom.id=:roomId and message.id >=:startMessageId and message.id <= :lastMessageId")
+    Slice<ChatMessage> findChatMessageByRoomId(@Param("roomId")Long roomId, @Param("startMessageId") Long startMessageId, @Param("lastMessageId") Long lastMessageId, Pageable pageable);
 
 
 
@@ -28,32 +28,43 @@ public interface ChatMessageJpaRepository extends JpaRepository<ChatMessage, Lon
             " limit  1")
     Optional<ChatMessage> findTopByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomId")Long chatRoomId);
 
+    /*
     @Query("select message from ChatMessage message" +
             " join fetch message.chatRoom" +
             " where message.chatRoom.id in :chatRoomIds" +
             " order by message.id desc " +
             " limit  1")
     List<ChatMessage> findTopsByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomIds")List<Long> chatRoomIds);
+    */
+
+
+
+    @Query("select message from ChatMessage message" +
+//            " join fetch message.chatRoom" +
+            " where message.id in (select max(m1.id) from ChatMessage m1 where m1.chatRoom.id in :chatRoomIds group by m1.chatRoom)")
+    List<ChatMessage> findTopsByChatRoomIdOrderByCreatedAtDesc(@Param("chatRoomIds")List<Long> chatRoomIds);
+
+
 
 
     @Query("select message from ChatMessage message" +
             " left join message.chatUser cu" +
             " left join cu.user" +
-            " where message.chatRoom.id=:roomId and message.createdAt>=:lastJoinedAt" +
+            " where message.chatRoom.id=:roomId and message.id>=:startMessageId" +
             " and message.messageType='IMAGE'" +
             " order by message.id asc ")
-    List<ChatMessage> findImagesByRoomId(@Param("roomId")Long roomId, @Param("lastJoinedAt") LocalDateTime lastJoinedAt);
+    List<ChatMessage> findImagesByRoomId(@Param("roomId")Long roomId, @Param("startMessageId") Long startMessageId);
 
 
     @Modifying
     @Query("update ChatMessage message set message.readCount=message.readCount+1" +
             " where message.chatRoom.id=:roomId" +
             " and message.chatUser.id != :chatUserId" +
-            " and message.createdAt<=:newTime" +
-            " and message.createdAt>:oldTime" +
+            " and message.id<=:new" +
+            " and message.id>:old" +
             " and message.readCount<:maxReadCount")
     void incrementUnreadMessageCount(@Param("roomId") Long roomId, @Param("chatUserId") Long chatUserId,
-                                     @Param("newTime") LocalDateTime newTime, @Param("oldTime") LocalDateTime oldTime,
+                                     @Param("old")Long oldLastReadMessageId,  @Param("new")Long newLastReadMessageId,
                                      @Param("maxReadCount") Integer maxReadCount);
 
 

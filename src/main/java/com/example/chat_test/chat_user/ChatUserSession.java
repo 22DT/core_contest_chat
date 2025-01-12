@@ -72,15 +72,14 @@ public class ChatUserSession {
         }
     }
 
-    public static void onRoom(ChatUser chatUser){
+    /*public static void onRoom(ChatUser chatUser){
         onRoom(chatUser.getUser().getId(), chatUser.getChatRoom().getId());
         chatUser.updateLastAccessedAt();
-    }
+    }*/
 
 
     public static void offRoom(ChatUser chatUser){
         offRoom(chatUser.getUser().getId(), chatUser.getChatRoom().getId());
-        chatUser.updateLastAccessedAt();
     }
     
     // 채팅방 활성화한 유저의 수

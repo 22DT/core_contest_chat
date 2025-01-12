@@ -29,6 +29,8 @@ public class ChatRoom {
     @Enumerated(STRING)
     private ChatRoomType type;
 
+
+
     @OneToOne(fetch=LAZY)
     @JoinColumn(name="team_id")
     private Team team;

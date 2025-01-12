@@ -51,22 +51,24 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     }
 
     @Override
-    public void sendRoomCreationMessage(Long roomId) {
-        ChatRoom chatRoom = chatRoomJpaRepository.getReferenceById(roomId);
+    public ChatMessage createEntryMessage(String message, MessageType type, Long roomId) {
+        ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId).get();
+
 
         ChatMessage chatMessage = ChatMessage.builder()
-                .message("채팅방 생성!")
-                .chatRoom((chatRoom))
+                .chatRoom(chatRoom)
+                .messageType(type)
+                .message(message)
                 .createdAt(LocalDateTime.now())
-                .messageType(MessageType.ENTER)
                 .build();
 
         chatMessageJpaRepository.save(chatMessage);
+        return chatMessage;
     }
 
     @Override
-    public Slice<ChatMessage> getChatMessages(Long roomId, LocalDateTime lastJoinedAt, LocalDateTime lastAccessedAt, Pageable pageable) {
-        return chatMessageJpaRepository.findChatMessageByRoomId(roomId, lastAccessedAt, lastJoinedAt, pageable);
+    public Slice<ChatMessage> getChatMessages(Long roomId, Long  startMessageId, Long  lastMessageId, Pageable pageable) {
+        return chatMessageJpaRepository.findChatMessageByRoomId(roomId, startMessageId, lastMessageId, pageable);
     }
 
     @Override
@@ -82,17 +84,17 @@ public class ChatMessageRepositoryImpl implements ChatMessageRepository {
     }
 
     @Override
-    public List<ChatMessage> getImages(Long roomId, LocalDateTime lastJoinedAt) {
-        return chatMessageJpaRepository.findImagesByRoomId(roomId, lastJoinedAt);
+    public List<ChatMessage> getImages(Long roomId, Long startMessageId) {
+        return chatMessageJpaRepository.findImagesByRoomId(roomId, startMessageId);
     }
 
 
     @Override
-    public void incrementUnreadMessageCount(Long roomId, Long chatUserId,LocalDateTime newTime,  LocalDateTime oldTime, Integer maxReadCount) {
+    public void incrementUnreadMessageCount(Long roomId, Long chatUserId,Long oldLastReadMessageId,  Long newLastReadMessageId, Integer maxReadCount) {
         log.info("[saveChatMessage][incrementUnreadMessageCount]");
 
         log.info("[incrementUnreadMessageCount][before]");
-        chatMessageJpaRepository.incrementUnreadMessageCount(roomId, chatUserId, newTime, oldTime, maxReadCount);
+        chatMessageJpaRepository.incrementUnreadMessageCount(roomId, chatUserId, oldLastReadMessageId, newLastReadMessageId, maxReadCount);
         log.info("[incrementUnreadMessageCount][after]");
     }
 

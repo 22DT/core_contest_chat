@@ -5,6 +5,7 @@ import com.example.chat_test.chat_message.dto.response.ChatMessageResponse;
 import com.example.chat_test.chat_message.service.ChatMessageService;
 import com.example.chat_test.chat_user.entity.ChatUser;
 import com.example.chat_test.user.service.data.UserDomain;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,7 +17,10 @@ import org.springframework.messaging.simp.user.SimpSubscription;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,9 +34,11 @@ public class StompChatController  {
     private final ChatMessageService chatMessageService;
     private final SimpUserRegistry simpUserRegistry;  // 그러고 보니 이거 같은 인스턴스 이용하는 건가?
 
+//    @MessageMapping("/{room-id}") // 이렇게?
+//    @SendTo("/room/{room-id}")
     @MessageMapping("/topic")
 //    @SendTo("topic/greetings")
-    public void topic(@Payload ChatMessageRequest chatMessage) {
+    public void topic(@Payload ChatMessageRequest chatMessage) throws IOException {
         log.info("[ChatController][topic]");
         log.info("chatMessage: {}", chatMessage);
 
@@ -41,7 +47,6 @@ public class StompChatController  {
                 .id(chatMessage.userId())
                 .build();
 
-        List<Long> onlineUserIds = getOnlineUsers(chatMessage.roomId());
 
         ChatMessageResponse chatMessageResponse = chatMessageService.send(chatMessage, user);
 
@@ -98,8 +103,5 @@ public class StompChatController  {
 
         return onlineUsers;
     }
-
-
-
 
 }

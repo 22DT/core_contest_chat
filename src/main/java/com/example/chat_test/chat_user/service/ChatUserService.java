@@ -18,9 +18,9 @@ public class ChatUserService {
     private final ChatUserRepository chatUserRepository;
 
 
-    public void createChatUsers(List<UserDomain> users, Long chatRoomId){
-        chatUserRepository.saveCharUsers(users, chatRoomId);
-    }
+    /*public void createChatUsers(List<UserDomain> users, Long chatRoomId){
+        chatUserRepository.saveChatUsers(users, chatRoomId);
+    }*/
 
     public List<ChatUserResponse> getChatUsers(Long roomId){
         List<ChatUser> chatUsers = chatUserRepository.getChatUsers(roomId);
